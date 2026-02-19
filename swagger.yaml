@@ -1,718 +1,993 @@
----
-swagger: "2.0"
+openapi: 3.0.3
 info:
-  description: "This is a sample server Petstore server.  You can find out more about\
-    \ Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).\
-    \  For this sample, you can use the api key `special-key` to test the authorization\
-    \ filters."
-  version: "1.0.5"
-  title: "Swagger Petstore"
-  termsOfService: "http://swagger.io/terms/"
-  contact:
-    email: "apiteam@swagger.io"
-  license:
-    name: "Apache 2.0"
-    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "petstore.swagger.io"
-basePath: "/v2"
-tags:
-- name: "pet"
-  description: "Everything about your Pets"
-  externalDocs:
-    description: "Find out more"
-    url: "http://swagger.io"
-- name: "store"
-  description: "Access to Petstore orders"
-- name: "user"
-  description: "Operations about user"
-  externalDocs:
-    description: "Find out more about our store"
-    url: "http://swagger.io"
-schemes:
-- "https"
-- "http"
+  title: diio API
+  description: |
+    Public API documentation for diio. Allows integration with Meetings, Phone Calls, Exports, Transcripts, Playbooks, and Users.
+
+    **Authorization:** JWT Bearer token with 1-hour expiration. Refresh using `POST /refresh_token`.
+
+    **Content-Type:** `application/json`
+  version: "1.0.0"
+
+servers:
+  - url: https://{subdomain}.diio.com/api/external
+    variables:
+      subdomain:
+        default: your-company-subdomain
+        description: Your company subdomain in diio
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Error400:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Bad Request
+    Error401:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Unauthorized
+    Error402:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Payment Required
+    Error404:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Not Found
+    Error500:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Internal Server Error
+
+    Seller:
+      type: object
+      properties:
+        name:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        user_id:
+          type: string
+          format: uuid
+          example: 99a2868c-8fa3-11f0-848f-06254876e271
+
+    Customer:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Customer
+        email:
+          type: string
+          format: email
+          example: customer@client.com
+        phone:
+          type: string
+          example: "+13055555555"
+
+    Attendees:
+      type: object
+      properties:
+        sellers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Seller'
+        customers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Customer'
+
+    Participant:
+      type: object
+      properties:
+        name:
+          type: string
+          example: John Doe
+        role:
+          type: string
+          enum: [seller, customer]
+          example: seller
+        show:
+          type: boolean
+          example: true
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        user_id:
+          type: string
+          format: uuid
+          nullable: true
+          example: 99a2868c-8fa3-11f0-848f-06254876e271
+        speak_time:
+          type: integer
+          example: 123
+        arrive_time:
+          type: string
+          format: date-time
+          example: "2025-10-01T15:12:09.146000Z"
+
+    MeetingSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 343f605a-0bde-11f0-a454-06254876e271
+        name:
+          type: string
+          example: Meeting with John
+        scheduled_at:
+          type: string
+          format: date-time
+          example: "2025-10-01T15:10:05"
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-10-01T15:10:05"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2025-10-01T15:10:05"
+        last_trancript_id:
+          type: string
+          format: uuid
+          example: 343f605a-0bde-11f0-a454-06254876e281
+        attendees:
+          $ref: '#/components/schemas/Attendees'
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/Participant'
+
+    MeetingDetail:
+      allOf:
+        - $ref: '#/components/schemas/MeetingSummary'
+        - type: object
+          properties:
+            analyzed_status:
+              type: string
+              enum: [finished, error]
+              example: finished
+            error_cause:
+              type: string
+              nullable: true
+              example: null
+
+    PhoneCallSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 343f605a-0bde-11f0-a454-06254876e271
+        name:
+          type: string
+          example: Call with John
+        occurred_at:
+          type: string
+          format: date-time
+          example: "2025-10-01T15:10:05"
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-10-01T15:10:05"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2025-10-01T15:10:05"
+        last_trancript_id:
+          type: string
+          format: uuid
+          example: 343f605a-0bde-11f0-a454-06254876e281
+        attendees:
+          $ref: '#/components/schemas/Attendees'
+
+    PhoneCallDetail:
+      allOf:
+        - $ref: '#/components/schemas/PhoneCallSummary'
+        - type: object
+          properties:
+            analyzed_status:
+              type: string
+              enum: [finished, error]
+              example: finished
+            error_cause:
+              type: string
+              nullable: true
+              example: null
+
+    PlaybookSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 343f605a-0bde-11f0-a454-06254876e271
+        name:
+          type: string
+          example: Call with John
+        version:
+          type: integer
+          example: 3
+        model_type:
+          type: string
+          enum: [meeting, phone_call, written_conversation, any]
+          example: any
+        updated_at:
+          type: string
+          format: date-time
+          example: "2025-10-01T15:10:05"
+        language:
+          type: string
+          example: es
+        description:
+          type: string
+          example: This is the playbook description
+
+    PlaybookDetail:
+      allOf:
+        - $ref: '#/components/schemas/PlaybookSummary'
+        - type: object
+          properties:
+            trackers:
+              type: array
+              items:
+                type: object
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 91992f26-a585-11ee-bc7e-06d5ade5f257
+        name:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          format: email
+          example: john@doe.com
+
+    ExportStatus:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 343f605a-0bde-11f0-a454-06254876e271
+        file_url:
+          type: string
+          nullable: true
+          example: "https://example.com/343f605a-0bde-11f0-a454-06254876e271.json"
+        email:
+          type: string
+          format: email
+          example: john@doe.com
+        status:
+          type: string
+          enum: [pending, in_progress, finished, error]
+          example: finished
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-01-01T01:01:01Z"
+
+  responses:
+    Unauthorized:
+      description: Invalid or expired access_token. Refresh required.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error401'
+    PaymentRequired:
+      description: Your account is deactivated, please contact support@diio.com.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error402'
+    BadRequest:
+      description: Malformed request or missing required parameters.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error400'
+    NotFound:
+      description: The requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error404'
+    InternalServerError:
+      description: Unexpected server error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error500'
+
+security:
+  - BearerAuth: []
+
 paths:
-  /pet/{petId}/uploadImage:
+
+  # ─── AUTH ───────────────────────────────────────────────────────────────────
+
+  /refresh_token:
     post:
       tags:
-      - "pet"
-      summary: "uploads an image"
-      description: ""
-      operationId: "uploadFile"
-      consumes:
-      - "multipart/form-data"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "petId"
-        in: "path"
-        description: "ID of pet to update"
+        - Auth
+      summary: Refresh access token
+      description: Refreshes and returns a new JWT access_token. Use this when your token has expired (401 response).
+      security: []
+      requestBody:
         required: true
-        type: "integer"
-        format: "int64"
-      - name: "additionalMetadata"
-        in: "formData"
-        description: "Additional data to pass to server"
-        required: false
-        type: "string"
-      - name: "file"
-        in: "formData"
-        description: "file to upload"
-        required: false
-        type: "file"
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - client_id
+                - client_secret
+                - refresh_token
+              properties:
+                client_id:
+                  type: string
+                  example: your-client-id
+                client_secret:
+                  type: string
+                  example: your-client-secret
+                refresh_token:
+                  type: string
+                  example: your-refresh-token
       responses:
-        200:
-          description: "successful operation"
+        '200':
+          description: New access_token returned successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ─── EXPORTS ────────────────────────────────────────────────────────────────
+
+  /v1/exports:
+    post:
+      tags:
+        - Exports
+      summary: Create an export
+      description: Creates a data export in JSON or CSV format. Can optionally send the file to an email address.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - file_type
+              properties:
+                file_type:
+                  type: string
+                  enum: [csv, json]
+                  description: The desired export format.
+                  example: json
+                send_to:
+                  type: string
+                  format: email
+                  description: Email address to send the export to.
+                  example: john@doe.com
+                model:
+                  type: string
+                  enum: [meeting, phone_call]
+                  default: meeting
+                  description: The model type to export.
+                  example: phone_call
+            example:
+              file_type: json
+              send_to: john@doe.com
+              model: phone_call
+      responses:
+        '200':
+          description: Export created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    example: 343f605a-0bde-11f0-a454-06254876e271
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/exports/{uuid}:
+    get:
+      tags:
+        - Exports
+      summary: Get export status
+      description: Queries the status and information of a previously created export by its UUID.
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          description: The UUID of the export generated via POST /v1/exports.
           schema:
-            $ref: "#/definitions/ApiResponse"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-  /pet:
+            type: string
+            format: uuid
+            example: 343f605a-0bde-11f0-a454-06254876e271
+      responses:
+        '200':
+          description: Export details returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportStatus'
+              examples:
+                pending:
+                  summary: Export is pending
+                  value:
+                    id: 343f605a-0bde-11f0-a454-06254876e271
+                    file_url: null
+                    email: john@doe.com
+                    status: pending
+                    created_at: "2025-01-01T01:01:01Z"
+                finished:
+                  summary: Export is finished
+                  value:
+                    id: 343f605a-0bde-11f0-a454-06254876e271
+                    file_url: "https://example.com/343f605a-0bde-11f0-a454-06254876e271.json"
+                    email: john@doe.com
+                    status: finished
+                    created_at: "2025-01-01T01:01:01Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ─── MEETINGS ───────────────────────────────────────────────────────────────
+
+  /v1/meetings:
+    get:
+      tags:
+        - Meetings
+      summary: List meetings
+      description: Returns a paginated list of meetings in your diio account.
+      parameters:
+        - name: page
+          in: query
+          required: false
+          description: The page number.
+          schema:
+            type: integer
+            example: 1
+        - name: limit
+          in: query
+          required: false
+          description: The number of meetings to return per page.
+          schema:
+            type: integer
+            example: 20
+      responses:
+        '200':
+          description: List of meetings returned successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meetings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MeetingSummary'
+                  total:
+                    type: integer
+                    example: 1000
+                  next:
+                    type: integer
+                    nullable: true
+                    example: 2
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/meetings/{id}:
+    get:
+      tags:
+        - Meetings
+      summary: Get a meeting
+      description: Returns detailed information for a specific meeting.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The UUID of the meeting.
+          schema:
+            type: string
+            format: uuid
+            example: 343f605a-0bde-11f0-a454-06254876e271
+      responses:
+        '200':
+          description: Meeting details returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeetingDetail'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ─── PHONE CALLS ────────────────────────────────────────────────────────────
+
+  /v1/phone_calls:
     post:
       tags:
-      - "pet"
-      summary: "Add a new pet to the store"
-      description: ""
-      operationId: "addPet"
-      consumes:
-      - "application/json"
-      - "application/xml"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Pet object that needs to be added to the store"
+        - Phone Calls
+      summary: Create a phone call
+      description: Creates a Phone Call record to be analyzed in diio.
+      requestBody:
         required: true
-        schema:
-          $ref: "#/definitions/Pet"
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - media_url
+                - duration
+                - user_id
+                - call_from_number
+                - customer_name
+                - customer_email
+                - customer_phone
+                - occurred_at
+              properties:
+                name:
+                  type: string
+                  description: Display name for the call.
+                  example: Call with John
+                media_url:
+                  type: string
+                  format: uri
+                  description: URL where diio can fetch the call recording.
+                  example: https://example.com/location-of-phone-call.mp3
+                duration:
+                  type: integer
+                  description: Duration of the call in seconds.
+                  example: 600
+                user_id:
+                  type: string
+                  format: uuid
+                  description: UUID of the diio user associated with the call.
+                  example: c2d83840-fb6d-11ef-b70f-06254876e271
+                call_from_number:
+                  type: string
+                  description: The phone number from which the call was made.
+                  example: "+130512341234"
+                customer_name:
+                  type: string
+                  description: Name of the customer that was called.
+                  example: John Doe
+                customer_email:
+                  type: string
+                  format: email
+                  description: Email of the customer that was called.
+                  example: john@doe.com
+                customer_phone:
+                  type: string
+                  description: Phone number of the customer that was called.
+                  example: "+130543214321"
+                occurred_at:
+                  type: string
+                  format: date-time
+                  description: UTC datetime when the call occurred.
+                  example: "2025-10-01T15:10:05"
       responses:
-        405:
-          description: "Invalid input"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
+        '200':
+          description: Phone call created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    example: 343f605a-0bde-11f0-a454-06254876e271
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    get:
+      tags:
+        - Phone Calls
+      summary: List phone calls
+      description: Returns a paginated list of phone calls in your diio account.
+      parameters:
+        - name: page
+          in: query
+          required: false
+          description: The page number.
+          schema:
+            type: integer
+            example: 1
+        - name: limit
+          in: query
+          required: false
+          description: Number of phone calls to return per page.
+          schema:
+            type: integer
+            example: 20
+      responses:
+        '200':
+          description: List of phone calls returned successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  phone_calls:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PhoneCallSummary'
+                  total:
+                    type: integer
+                    example: 1000
+                  next:
+                    type: integer
+                    nullable: true
+                    example: 2
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/phone_calls/{id}:
+    get:
+      tags:
+        - Phone Calls
+      summary: Get a phone call
+      description: Returns detailed information for a specific phone call.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The UUID of the phone call.
+          schema:
+            type: string
+            format: uuid
+            example: 343f605a-0bde-11f0-a454-06254876e271
+      responses:
+        '200':
+          description: Phone call details returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhoneCallDetail'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
     put:
       tags:
-      - "pet"
-      summary: "Update an existing pet"
-      description: ""
-      operationId: "updatePet"
-      consumes:
-      - "application/json"
-      - "application/xml"
-      produces:
-      - "application/json"
-      - "application/xml"
+        - Phone Calls
+      summary: Update a phone call
+      description: Edit information for a specific phone call in your diio account.
       parameters:
-      - in: "body"
-        name: "body"
-        description: "Pet object that needs to be added to the store"
-        required: true
-        schema:
-          $ref: "#/definitions/Pet"
-      responses:
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Pet not found"
-        405:
-          description: "Validation exception"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-  /pet/findByStatus:
-    get:
-      tags:
-      - "pet"
-      summary: "Finds Pets by status"
-      description: "Multiple status values can be provided with comma separated strings"
-      operationId: "findPetsByStatus"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "status"
-        in: "query"
-        description: "Status values that need to be considered for filter"
-        required: true
-        type: "array"
-        items:
-          type: "string"
-          enum:
-          - "available"
-          - "pending"
-          - "sold"
-          default: "available"
-        collectionFormat: "multi"
-      responses:
-        200:
-          description: "successful operation"
+        - name: id
+          in: path
+          required: true
+          description: The UUID of the phone call.
           schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Pet"
-        400:
-          description: "Invalid status value"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-  /pet/findByTags:
-    get:
-      tags:
-      - "pet"
-      summary: "Finds Pets by tags"
-      description: "Multiple tags can be provided with comma separated strings. Use\
-        \ tag1, tag2, tag3 for testing."
-      operationId: "findPetsByTags"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "tags"
-        in: "query"
-        description: "Tags to filter by"
-        required: true
-        type: "array"
-        items:
-          type: "string"
-        collectionFormat: "multi"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Pet"
-        400:
-          description: "Invalid tag value"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-      deprecated: true
-  /pet/{petId}:
-    get:
-      tags:
-      - "pet"
-      summary: "Find pet by ID"
-      description: "Returns a single pet"
-      operationId: "getPetById"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "petId"
-        in: "path"
-        description: "ID of pet to return"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Pet"
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Pet not found"
-      security:
-      - api_key: []
-    post:
-      tags:
-      - "pet"
-      summary: "Updates a pet in the store with form data"
-      description: ""
-      operationId: "updatePetWithForm"
-      consumes:
-      - "application/x-www-form-urlencoded"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "petId"
-        in: "path"
-        description: "ID of pet that needs to be updated"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "name"
-        in: "formData"
-        description: "Updated name of the pet"
+            type: string
+            format: uuid
+            example: 343f605a-0bde-11f0-a454-06254876e271
+      requestBody:
         required: false
-        type: "string"
-      - name: "status"
-        in: "formData"
-        description: "Updated status of the pet"
-        required: false
-        type: "string"
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: New name for the phone call.
+                  example: Call with John - updated
+                media_url:
+                  type: string
+                  format: uri
+                  description: New URL for the call recording.
+                  example: https://example.com/new-location.mp3
+                call_from_number:
+                  type: string
+                  description: Updated number from which the call was made.
+                  example: "+130512341234"
+                customer_name:
+                  type: string
+                  description: Updated customer name.
+                  example: John Doe
+                customer_email:
+                  type: string
+                  format: email
+                  description: Updated customer email.
+                  example: john@doe.com
+                customer_phone:
+                  type: string
+                  description: Updated customer phone number.
+                  example: "+130543214321"
       responses:
-        405:
-          description: "Invalid input"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-    delete:
-      tags:
-      - "pet"
-      summary: "Deletes a pet"
-      description: ""
-      operationId: "deletePet"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "api_key"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "petId"
-        in: "path"
-        description: "Pet id to delete"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Pet not found"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-  /store/order:
-    post:
-      tags:
-      - "store"
-      summary: "Place an order for a pet"
-      description: ""
-      operationId: "placeOrder"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "order placed for purchasing the pet"
-        required: true
-        schema:
-          $ref: "#/definitions/Order"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-        400:
-          description: "Invalid Order"
-  /store/order/{orderId}:
+        '200':
+          description: Phone call updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    example: 343f605a-0bde-11f0-a454-06254876e271
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ─── PLAYBOOKS ──────────────────────────────────────────────────────────────
+
+  /v1/playbooks:
     get:
       tags:
-      - "store"
-      summary: "Find purchase order by ID"
-      description: "For valid response try integer IDs with value >= 1 and <= 10.\
-        \ Other values will generated exceptions"
-      operationId: "getOrderById"
-      produces:
-      - "application/json"
-      - "application/xml"
+        - Playbooks
+      summary: List playbooks
+      description: Returns a paginated list of playbooks in your diio account.
       parameters:
-      - name: "orderId"
-        in: "path"
-        description: "ID of pet that needs to be fetched"
-        required: true
-        type: "integer"
-        maximum: 10
-        minimum: 1
-        format: "int64"
-      responses:
-        200:
-          description: "successful operation"
+        - name: page
+          in: query
+          required: false
+          description: The page number.
           schema:
-            $ref: "#/definitions/Order"
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Order not found"
-    delete:
-      tags:
-      - "store"
-      summary: "Delete purchase order by ID"
-      description: "For valid response try integer IDs with positive integer value.\
-        \ Negative or non-integer values will generate API errors"
-      operationId: "deleteOrder"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "orderId"
-        in: "path"
-        description: "ID of the order that needs to be deleted"
-        required: true
-        type: "integer"
-        minimum: 1
-        format: "int64"
+            type: integer
+            example: 1
+        - name: limit
+          in: query
+          required: false
+          description: Number of playbooks to return per page.
+          schema:
+            type: integer
+            example: 20
       responses:
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Order not found"
-  /store/inventory:
+        '200':
+          description: List of playbooks returned successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  playbooks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PlaybookSummary'
+                  total:
+                    type: integer
+                    example: 1000
+                  next:
+                    type: integer
+                    nullable: true
+                    example: 2
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /v1/playbooks/{id}:
     get:
       tags:
-      - "store"
-      summary: "Returns pet inventories by status"
-      description: "Returns a map of status codes to quantities"
-      operationId: "getInventory"
-      produces:
-      - "application/json"
-      parameters: []
-      responses:
-        200:
-          description: "successful operation"
+        - Playbooks
+      summary: Get a playbook
+      description: Returns detailed information for a specific playbook including its trackers.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The UUID of the playbook.
           schema:
-            type: "object"
-            additionalProperties:
-              type: "integer"
-              format: "int32"
-      security:
-      - api_key: []
-  /user/createWithArray:
-    post:
-      tags:
-      - "user"
-      summary: "Creates list of users with given input array"
-      description: ""
-      operationId: "createUsersWithArrayInput"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "List of user object"
-        required: true
-        schema:
-          type: "array"
-          items:
-            $ref: "#/definitions/User"
+            type: string
+            format: uuid
+            example: 343f605a-0bde-11f0-a454-06254876e271
       responses:
-        default:
-          description: "successful operation"
-  /user/createWithList:
-    post:
-      tags:
-      - "user"
-      summary: "Creates list of users with given input array"
-      description: ""
-      operationId: "createUsersWithListInput"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "List of user object"
-        required: true
-        schema:
-          type: "array"
-          items:
-            $ref: "#/definitions/User"
-      responses:
-        default:
-          description: "successful operation"
-  /user/{username}:
+        '200':
+          description: Playbook details returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaybookDetail'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ─── TRANSCRIPTS ────────────────────────────────────────────────────────────
+
+  /v1/transcripts/{id}:
     get:
       tags:
-      - "user"
-      summary: "Get user by user name"
-      description: ""
-      operationId: "getUserByName"
-      produces:
-      - "application/json"
-      - "application/xml"
+        - Transcripts
+      summary: Get a transcript
+      description: Returns a transcript object associated to a diio object (phone call or meeting).
       parameters:
-      - name: "username"
-        in: "path"
-        description: "The name that needs to be fetched. Use user1 for testing. "
-        required: true
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
+        - name: id
+          in: path
+          required: true
+          description: The UUID of the transcript.
           schema:
-            $ref: "#/definitions/User"
-        400:
-          description: "Invalid username supplied"
-        404:
-          description: "User not found"
-    put:
-      tags:
-      - "user"
-      summary: "Updated user"
-      description: "This can only be done by the logged in user."
-      operationId: "updateUser"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "username"
-        in: "path"
-        description: "name that need to be updated"
-        required: true
-        type: "string"
-      - in: "body"
-        name: "body"
-        description: "Updated user object"
-        required: true
-        schema:
-          $ref: "#/definitions/User"
+            type: string
+            format: uuid
+            example: 91992f26-a585-11ee-bc7e-06d5ade5f257
+        - name: email
+          in: query
+          required: false
+          description: Filter transcript information by user email.
+          schema:
+            type: string
+            format: email
+            example: john@doe.com
       responses:
-        400:
-          description: "Invalid user supplied"
-        404:
-          description: "User not found"
-    delete:
-      tags:
-      - "user"
-      summary: "Delete user"
-      description: "This can only be done by the logged in user."
-      operationId: "deleteUser"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "username"
-        in: "path"
-        description: "The name that needs to be deleted"
-        required: true
-        type: "string"
-      responses:
-        400:
-          description: "Invalid username supplied"
-        404:
-          description: "User not found"
-  /user/login:
+        '200':
+          description: Transcript returned successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    example: 91992f26-a585-11ee-bc7e-06d5ade5f257
+                  transcript:
+                    type: string
+                    example: Lorem ipsum...
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ─── USERS ──────────────────────────────────────────────────────────────────
+
+  /v1/users:
     get:
       tags:
-      - "user"
-      summary: "Logs user into the system"
-      description: ""
-      operationId: "loginUser"
-      produces:
-      - "application/json"
-      - "application/xml"
+        - Users
+      summary: List users
+      description: Returns a list of all users in your diio account. Can be filtered by email. Limit is 10 users per page.
       parameters:
-      - name: "username"
-        in: "query"
-        description: "The user name for login"
-        required: true
-        type: "string"
-      - name: "password"
-        in: "query"
-        description: "The password for login in clear text"
-        required: true
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          headers:
-            X-Expires-After:
-              type: "string"
-              format: "date-time"
-              description: "date in UTC when token expires"
-            X-Rate-Limit:
-              type: "integer"
-              format: "int32"
-              description: "calls per hour allowed by the user"
+        - name: page
+          in: query
+          required: false
+          description: The page number (10 users per page).
           schema:
-            type: "string"
-        400:
-          description: "Invalid username/password supplied"
-  /user/logout:
-    get:
-      tags:
-      - "user"
-      summary: "Logs out current logged in user session"
-      description: ""
-      operationId: "logoutUser"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters: []
+            type: integer
+            example: 1
+        - name: email
+          in: query
+          required: false
+          description: Filter by a specific user's email.
+          schema:
+            type: string
+            format: email
+            example: john@doe.com
       responses:
-        default:
-          description: "successful operation"
-  /user:
-    post:
-      tags:
-      - "user"
-      summary: "Create user"
-      description: "This can only be done by the logged in user."
-      operationId: "createUser"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Created user object"
-        required: true
-        schema:
-          $ref: "#/definitions/User"
-      responses:
-        default:
-          description: "successful operation"
-securityDefinitions:
-  api_key:
-    type: "apiKey"
-    name: "api_key"
-    in: "header"
-  petstore_auth:
-    type: "oauth2"
-    authorizationUrl: "https://petstore.swagger.io/oauth/authorize"
-    flow: "implicit"
-    scopes:
-      read:pets: "read your pets"
-      write:pets: "modify pets in your account"
-definitions:
-  ApiResponse:
-    type: "object"
-    properties:
-      code:
-        type: "integer"
-        format: "int32"
-      type:
-        type: "string"
-      message:
-        type: "string"
-  Category:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      name:
-        type: "string"
-    xml:
-      name: "Category"
-  Pet:
-    type: "object"
-    required:
-    - "name"
-    - "photoUrls"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      category:
-        $ref: "#/definitions/Category"
-      name:
-        type: "string"
-        example: "doggie"
-      photoUrls:
-        type: "array"
-        xml:
-          wrapped: true
-        items:
-          type: "string"
-          xml:
-            name: "photoUrl"
-      tags:
-        type: "array"
-        xml:
-          wrapped: true
-        items:
-          xml:
-            name: "tag"
-          $ref: "#/definitions/Tag"
-      status:
-        type: "string"
-        description: "pet status in the store"
-        enum:
-        - "available"
-        - "pending"
-        - "sold"
-    xml:
-      name: "Pet"
-  Tag:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      name:
-        type: "string"
-    xml:
-      name: "Tag"
-  Order:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      petId:
-        type: "integer"
-        format: "int64"
-      quantity:
-        type: "integer"
-        format: "int32"
-      shipDate:
-        type: "string"
-        format: "date-time"
-      status:
-        type: "string"
-        description: "Order Status"
-        enum:
-        - "placed"
-        - "approved"
-        - "delivered"
-      complete:
-        type: "boolean"
-    xml:
-      name: "Order"
-  User:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      username:
-        type: "string"
-      firstName:
-        type: "string"
-      lastName:
-        type: "string"
-      email:
-        type: "string"
-      password:
-        type: "string"
-      phone:
-        type: "string"
-      userStatus:
-        type: "integer"
-        format: "int32"
-        description: "User Status"
-    xml:
-      name: "User"
-externalDocs:
-  description: "Find out more about Swagger"
-  url: "http://swagger.io"
+        '200':
+          description: List of users returned successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+              example:
+                users:
+                  - name: John Doe
+                    email: john@doe.com
+                    id: 91992f26-a585-11ee-bc7e-06d5ade5f257
+                  - name: Jane Doe
+                    email: jane@doe.com
+                    id: 0b3e264a-9b83-11ee-9bd5-06d5ade5f257
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
