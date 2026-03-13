@@ -920,14 +920,14 @@ abc123challenge</code></pre>
     <section class="sec" id="wh-sig">
       <div class="sec-title">${t.whSigTitle}</div>
       <p class="sec-desc">${t.whSigDesc}</p>
-      <pre><code>sign = "&lt;webhook_id&gt;-&lt;DO-Timestamp&gt;"
+      <pre><code>sign = "&lt;id_of_the_object_in_the_payload&gt;-&lt;DO-Timestamp&gt;"
 DO-Signature == HMAC-SHA256(signing_secret, sign)</code></pre>
       <div class="info-box">${t.whSigSecret}</div>
       <div class="sub-title">Python</div>
       <pre><code>import hmac, hashlib
 
-def verify_signature(webhook_id, timestamp, signature, secret):
-    sign = f"{webhook_id}-{timestamp}"
+def verify_signature(id_of_the_object_in_the_payload, timestamp, signature, secret):
+    sign = f"{id_of_the_object_in_the_payload}-{timestamp}"
     expected = hmac.new(
         secret.encode(), sign.encode(), hashlib.sha256
     ).hexdigest()
