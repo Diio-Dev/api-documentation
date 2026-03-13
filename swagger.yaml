@@ -30,24 +30,28 @@ components:
         error:
           type: string
           example: Bad Request
+
     Error401:
       type: object
       properties:
         error:
           type: string
           example: Unauthorized
+
     Error402:
       type: object
       properties:
         error:
           type: string
           example: Payment Required
+
     Error404:
       type: object
       properties:
         error:
           type: string
           example: Not Found
+
     Error500:
       type: object
       properties:
@@ -337,7 +341,12 @@ paths:
       tags:
         - Auth
       summary: Refresh access token
-      description: Refreshes and returns a new JWT access_token. Use this when your token has expired (401 response).
+      description: |
+        Refreshes and returns a new JWT access_token. Use this when your token has expired (401 response).
+
+        **Interactive auth:** Use the **Authorize** button at the top of this page to input your
+        `client_id`, `client_secret`, and `refresh_token`. The returned `access_token` will be
+        automatically applied to all subsequent requests.
       security: []
       requestBody:
         required: true

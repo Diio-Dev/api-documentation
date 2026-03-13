@@ -1,19 +1,1015 @@
-<!-- HTML for static distribution bundle build -->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <title>diio API Documentation</title>
-    <link rel="stylesheet" type="text/css" href="dist/swagger-ui.css" />
-    <link rel="stylesheet" type="text/css" href="dist/index.css" />
-    <link rel="icon" type="image/png" href="dist/favicon-32x32.png" sizes="32x32" />
-    <link rel="icon" type="image/png" href="dist/favicon-16x16.png" sizes="16x16" />
-  </head>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>diio API Documentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4d65ff;
+      --primary-light: #eef1ff;
+      --primary-dark: #3347e0;
+      --dark: #1a1f36;
+      --text: #374151;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --bg: #f5f6fa;
+      --white: #ffffff;
+      --sw: 264px;
+      --green: #059669; --green-bg: #d1fae5;
+      --blue: #1e40af; --blue-bg: #dbeafe;
+      --amber: #92400e; --amber-bg: #fef3c7;
+      --red: #991b1b; --red-bg: #fee2e2;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); color: var(--text); background: var(--bg); }
 
-  <body>
-    <div id="swagger-ui"></div>
-    <script src="dist/swagger-ui-bundle.js" charset="UTF-8"> </script>
-    <script src="dist/swagger-ui-standalone-preset.js" charset="UTF-8"> </script>
-    <script src="dist/swagger-initializer.js" charset="UTF-8"> </script>
-  </body>
+    /* HEADER */
+    .hdr { position: fixed; top: 0; left: 0; right: 0; height: 58px; background: var(--dark); display: flex; align-items: center; padding: 0 20px; z-index: 200; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .hdr-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo-mark { width: 30px; height: 30px; background: var(--primary); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; color: white; letter-spacing: -1px; flex-shrink: 0; }
+    .logo-name { font-size: 17px; font-weight: 700; color: white; letter-spacing: -0.5px; }
+    .logo-badge { font-size: 10px; background: rgba(77,101,255,0.25); color: #a5b4fc; padding: 2px 8px; border-radius: 100px; border: 1px solid rgba(77,101,255,0.35); font-weight: 500; }
+    .hdr-right { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+    .lang-btn { padding: 5px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: transparent; color: rgba(255,255,255,0.55); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: var(--font); letter-spacing: 0.03em; }
+    .lang-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+    .lang-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+    /* LAYOUT */
+    .layout { display: flex; margin-top: 58px; min-height: calc(100vh - 58px); }
+
+    /* SIDEBAR */
+    .sidebar { width: var(--sw); position: fixed; top: 58px; bottom: 0; left: 0; overflow-y: auto; background: var(--white); border-right: 1px solid var(--border); padding: 16px 0 32px; }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .sb-group-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); padding: 16px 18px 5px; }
+    .sb-link { display: flex; align-items: center; gap: 8px; padding: 7px 18px; font-size: 13px; color: var(--text); text-decoration: none; border-left: 3px solid transparent; transition: all 0.12s; line-height: 1.4; }
+    .sb-link:hover { background: var(--primary-light); color: var(--primary); }
+    .sb-link.active { background: var(--primary-light); color: var(--primary); border-left-color: var(--primary); font-weight: 600; }
+    .sb-method { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; flex-shrink: 0; }
+
+    /* MAIN */
+    .main { margin-left: var(--sw); flex: 1; padding: 40px 48px 80px; max-width: 1100px; }
+
+    /* SECTIONS */
+    .sec { margin-bottom: 60px; scroll-margin-top: 78px; }
+    .sec-title { font-size: 24px; font-weight: 700; color: var(--dark); margin-bottom: 10px; padding-bottom: 12px; border-bottom: 2px solid var(--border); }
+    .sec-desc { font-size: 15px; line-height: 1.75; color: var(--text); margin-bottom: 20px; }
+
+    /* INTRO HERO */
+    .hero { background: linear-gradient(135deg, var(--dark) 0%, #1e2a5e 100%); border-radius: 14px; padding: 40px 44px; margin-bottom: 48px; color: white; }
+    .hero h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 10px; }
+    .hero p { font-size: 16px; opacity: 0.75; line-height: 1.6; max-width: 600px; }
+    .hero-badges { display: flex; gap: 10px; margin-top: 24px; flex-wrap: wrap; }
+    .hero-badge { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 14px; font-size: 13px; }
+    .hero-badge-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; flex-shrink: 0; }
+
+    /* INFO BOXES */
+    .info-box { border-left: 4px solid var(--primary); background: var(--primary-light); padding: 12px 16px; border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.65; margin-bottom: 20px; }
+    .warn-box { border-left: 4px solid #f59e0b; background: #fffbeb; padding: 12px 16px; border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.65; margin-bottom: 20px; }
+
+    /* CODE */
+    pre { background: #1e2235; border-radius: 10px; padding: 18px 20px; overflow-x: auto; margin-bottom: 16px; }
+    pre code { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; color: #e2e8f0; background: none; }
+    code.ic { background: var(--primary-light); color: var(--primary); padding: 2px 7px; border-radius: 4px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12.5px; font-weight: 500; }
+
+    /* ENDPOINT CARDS */
+    .ep-card { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 12px; background: var(--white); }
+    .ep-hdr { display: flex; align-items: center; gap: 12px; padding: 14px 18px; cursor: pointer; user-select: none; transition: background 0.1s; }
+    .ep-hdr:hover { background: #f8f9ff; }
+    .ep-hdr.open { background: #f8f9ff; }
+    .meth { font-size: 10.5px; font-weight: 800; padding: 3px 9px; border-radius: 5px; min-width: 50px; text-align: center; letter-spacing: 0.04em; flex-shrink: 0; }
+    .m-get { background: var(--green-bg); color: var(--green); }
+    .m-post { background: var(--blue-bg); color: var(--blue); }
+    .m-put { background: var(--amber-bg); color: var(--amber); }
+    .m-delete { background: var(--red-bg); color: var(--red); }
+    .ep-path { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13.5px; color: var(--dark); font-weight: 500; }
+    .ep-sum { font-size: 13px; color: var(--muted); margin-left: auto; padding-left: 12px; }
+    .chevron { color: var(--muted); transition: transform 0.2s; flex-shrink: 0; margin-left: 8px; }
+    .ep-hdr.open .chevron { transform: rotate(180deg); }
+    .ep-body { display: none; padding: 22px 22px 24px; border-top: 1px solid var(--border); }
+    .ep-body.open { display: block; }
+    .ep-desc { font-size: 14px; line-height: 1.7; color: var(--text); margin-bottom: 20px; }
+
+    /* PARAMS TABLE */
+    .tbl-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 8px; }
+    .params-tbl { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 22px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .params-tbl th { background: var(--bg); padding: 9px 14px; text-align: left; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); }
+    .params-tbl td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
+    .params-tbl tr:last-child td { border-bottom: none; }
+    .p-name { font-family: 'SF Mono', 'Fira Code', monospace; font-weight: 600; color: var(--dark); font-size: 12.5px; }
+    .p-req { font-size: 10px; color: #dc2626; font-weight: 700; margin-left: 4px; }
+    .p-opt { font-size: 10px; color: var(--muted); font-weight: 600; margin-left: 4px; }
+    .p-type { font-family: 'SF Mono', 'Fira Code', monospace; color: var(--primary); font-size: 12px; }
+    .p-ex { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; color: var(--muted); }
+
+    /* RESPONSES */
+    .resp-row { display: flex; align-items: flex-start; gap: 14px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; }
+    .resp-row:last-child { border-bottom: none; }
+    .resp-code { font-family: 'SF Mono', monospace; font-weight: 700; font-size: 13px; min-width: 42px; }
+    .s200 { color: var(--green); } .s201 { color: var(--green); } .s400 { color: #d97706; } .s401 { color: #dc2626; } .s402 { color: #dc2626; } .s404 { color: #dc2626; } .s500 { color: #9333ea; }
+
+    /* SUBSECTION */
+    .sub-title { font-size: 17px; font-weight: 600; color: var(--dark); margin: 28px 0 10px; }
+
+    /* EVENT CARDS */
+    .ev-card { border: 1px solid var(--border); border-radius: 10px; margin-bottom: 12px; background: var(--white); overflow: hidden; }
+    .ev-hdr { display: flex; align-items: center; gap: 12px; padding: 14px 18px; cursor: pointer; background: white; transition: background 0.1s; }
+    .ev-hdr:hover { background: #f8f9ff; }
+    .ev-hdr.open { background: #f8f9ff; }
+    .ev-action { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; font-weight: 600; color: var(--primary); }
+    .ev-desc { font-size: 13px; color: var(--muted); margin-left: auto; padding-left: 12px; }
+    .ev-body { display: none; padding: 20px 22px; border-top: 1px solid var(--border); }
+    .ev-body.open { display: block; }
+    .ev-desc-full { font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+
+    /* CREDS LIST */
+    .creds-list { list-style: none; padding: 0; margin: 12px 0; }
+    .creds-list li { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; font-size: 14px; }
+    .creds-list li::before { content: '→'; color: var(--primary); font-weight: 700; flex-shrink: 0; }
+
+    /* BACK TO TOP */
+    #btt { position: fixed; bottom: 28px; right: 28px; width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: white; border: none; cursor: pointer; display: none; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 4px 14px rgba(77,101,255,0.4); transition: transform 0.2s; z-index: 100; }
+    #btt:hover { transform: translateY(-2px); }
+    #btt.show { display: flex; }
+
+    /* FOOTER */
+    .footer { border-top: 1px solid var(--border); margin-top: 60px; padding: 28px 48px; margin-left: var(--sw); background: white; display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--muted); }
+    .footer a { color: var(--primary); text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 24px 20px 60px; }
+      .footer { margin-left: 0; padding: 20px; }
+      .hero { padding: 28px 24px; }
+      .hero h1 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="hdr">
+  <a href="#overview" class="hdr-logo">
+    <div class="logo-mark">d</div>
+    <span class="logo-name">diio</span>
+    <span class="logo-badge" id="lbl-api-docs">API Docs</span>
+  </a>
+  <div class="hdr-right">
+    <button class="lang-btn active" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('es')">ES</button>
+    <button class="lang-btn" onclick="setLang('pt')">PT</button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar"></nav>
+  <main class="main" id="main"></main>
+</div>
+
+<footer class="footer">
+  <span id="footer-copy">© 2025 diio. API v1.0</span>
+  <a href="https://diio.com" target="_blank" id="footer-link">diio.com →</a>
+</footer>
+
+<button id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+
+<script>
+// ─── TRANSLATIONS ──────────────────────────────────────────────────────────────
+const T = {
+  en: {
+    apiDocs: 'API Docs',
+    // Nav
+    navOverview: 'Overview', navGettingStarted: 'Getting Started', navAuth: 'Authentication',
+    navRestApi: 'REST API', navAuthEp: 'Auth', navExports: 'Exports', navMeetings: 'Meetings',
+    navCalls: 'Phone Calls', navPlaybooks: 'Playbooks', navTranscripts: 'Transcripts',
+    navUsers: 'Users', navWebhooks: 'Webhooks', navWHSetup: 'Setup & Validation',
+    navWHSig: 'Signature Verification', navWHEvents: 'Events Reference',
+    // Hero
+    heroTitle: 'diio API Documentation',
+    heroSub: 'Integrate your systems with diio — meetings, phone calls, exports, transcripts, playbooks, and more.',
+    heroV1: 'REST API v1.0', heroJson: 'JSON', heroBearer: 'JWT Bearer Auth',
+    // Getting Started
+    gsTitle: 'Getting Started',
+    gsDesc: 'The diio API lets you programmatically access data in your diio account. All requests go to:',
+    gsDesc2: 'All requests must include an <code class="ic">Authorization</code> header with a valid JWT Bearer token. Tokens expire after 1 hour.',
+    gsContentType: 'All request and response bodies use <code class="ic">application/json</code>.',
+    // Auth section
+    authTitle: 'Authentication',
+    authDesc: 'diio uses JWT Bearer tokens. Tokens are valid for 1 hour. When a token expires (401), use your <code class="ic">refresh_token</code> to get a new one.',
+    authCreds: 'Your API credentials:',
+    authCred1: '<code class="ic">client_id</code> — your API client identifier',
+    authCred2: '<code class="ic">client_secret</code> — your API client secret',
+    authCred3: '<code class="ic">refresh_token</code> — long-lived token to obtain new access tokens',
+    authHeaderLabel: 'Include your access token in every request:',
+    // Labels
+    lReqBody: 'Request Body', lPathParams: 'Path Parameters', lQueryParams: 'Query Parameters',
+    lHeaders: 'Request Headers', lResponses: 'Responses', lRequired: 'required', lOptional: 'optional',
+    lName: 'Name', lType: 'Type', lDesc: 'Description', lExample: 'Example',
+    lExReq: 'Example Request', lExRes: 'Example Response',
+    // Endpoint summaries
+    epRefreshSum: 'Refresh access token', epCreateExportSum: 'Create an export', epGetExportSum: 'Get export status',
+    epListMeetingsSum: 'List meetings', epGetMeetingSum: 'Get a meeting',
+    epCreateCallSum: 'Create a phone call', epListCallsSum: 'List phone calls',
+    epGetCallSum: 'Get a phone call', epUpdateCallSum: 'Update a phone call',
+    epListPlaybooksSum: 'List playbooks', epGetPlaybookSum: 'Get a playbook',
+    epGetTranscriptSum: 'Get a transcript', epListUsersSum: 'List users',
+    // Endpoint descriptions
+    epRefreshDesc: 'Refreshes and returns a new JWT access_token. Call this when your current token has expired (401 response). This endpoint does <strong>not</strong> require authentication.',
+    epCreateExportDesc: 'Creates a data export in JSON or CSV format. Optionally sends the file to an email address. Returns an export ID to poll for status.',
+    epGetExportDesc: 'Returns the status of a previously created export. Poll until status is <code class="ic">finished</code> and a <code class="ic">file_url</code> is available.',
+    epListMeetingsDesc: 'Returns a paginated list of all meetings in your diio account.',
+    epGetMeetingDesc: 'Returns detailed information for a specific meeting by UUID.',
+    epCreateCallDesc: 'Creates a Phone Call record in diio for AI analysis. Provide the recording URL, duration, and participant details.',
+    epListCallsDesc: 'Returns a paginated list of all phone calls in your diio account.',
+    epGetCallDesc: 'Returns detailed information for a specific phone call.',
+    epUpdateCallDesc: 'Updates the information of a specific phone call record. All body fields are optional.',
+    epListPlaybooksDesc: 'Returns a paginated list of all playbooks in your diio account.',
+    epGetPlaybookDesc: 'Returns detailed information for a specific playbook, including its tracker definitions.',
+    epGetTranscriptDesc: 'Returns the transcript for a meeting or phone call. Optionally filter content by user email.',
+    epListUsersDesc: 'Returns a list of all users in your diio account. Limit: 10 per page. Filterable by email.',
+    // Param descriptions
+    pPage: 'Page number.', pLimit: 'Results per page.', pEmail: 'Filter by user email.',
+    pExportId: 'UUID of the export returned by POST /v1/exports.',
+    pMeetingId: 'UUID of the meeting.', pCallId: 'UUID of the phone call.',
+    pPlaybookId: 'UUID of the playbook.', pTranscriptId: 'UUID of the transcript.',
+    pTranscriptEmail: 'Filter transcript content by user email.',
+    pFileType: 'Export format.', pSendTo: 'Email address to send the export file.',
+    pModel: 'Data type to export.', pName: 'Display name.',
+    pMediaUrl: 'URL where diio can fetch the call recording.',
+    pDuration: 'Duration of the call in seconds.',
+    pUserId: 'UUID of the diio user associated with the call.',
+    pCallFromNumber: 'Phone number from which the call was made.',
+    pCustomerName: 'Name of the customer.',
+    pCustomerEmail: 'Email of the customer.',
+    pCustomerPhone: 'Phone number of the customer.',
+    pOccurredAt: 'UTC datetime when the call occurred.',
+    // Responses
+    r200Refresh: 'New access_token returned successfully.',
+    r200Export: 'Export created. Returns the export ID.',
+    r200ExportGet: 'Export status returned.',
+    r200List: 'List returned successfully.',
+    r200Detail: 'Object details returned.',
+    r200Create: 'Created successfully. Returns the new object ID.',
+    r200Update: 'Updated successfully.',
+    r400: 'Malformed request or missing required parameters.',
+    r401: 'Invalid or expired access_token.',
+    r402: 'Account deactivated. Contact support@diio.com.',
+    r404: 'Resource not found.',
+    r500: 'Unexpected server error.',
+    // Webhooks
+    whTitle: 'Webhooks',
+    whIntro: 'Webhooks let diio push real-time notifications to your server when events occur in your account. Instead of polling the API, your endpoint receives POST requests automatically.',
+    whSetupTitle: 'Setup & Validation',
+    whSetupDesc: 'To configure webhooks, go to <strong>Company Settings → Integrations → Webhooks</strong> and click <strong>"New Webhook"</strong>.',
+    whValidTitle: 'Endpoint Validation',
+    whValidDesc: 'Before receiving events, diio validates your endpoint with a GET request. Your server must respond with the <code class="ic">echo_string</code> value in plain text:',
+    whSigTitle: 'Signature Verification',
+    whSigDesc: 'Every webhook request includes <code class="ic">DO-Signature</code> and <code class="ic">DO-Timestamp</code> headers. Verify authenticity using HMAC-SHA256:',
+    whSigSecret: 'Your signing secret is shown in the webhook configuration (click the eye icon next to the webhook).',
+    whEventsTitle: 'Events Reference',
+    whEventsDesc: 'Subscribe to any combination of these events when creating or editing a webhook.',
+    // Event descriptions
+    evMeetingInProgress: 'Fired when a meeting is actively occurring.',
+    evMeetingPending: 'Fired when a meeting is scheduled and awaiting start.',
+    evMeetingFinished: 'Fired when a meeting completed and was analyzed.',
+    evMeetingError: 'Fired when a meeting could not be processed.',
+    evCallInProgress: 'Fired when a phone call is being processed.',
+    evCallPending: 'Fired when a phone call is queued for processing.',
+    evCallFinished: 'Fired when a phone call was analyzed.',
+    evCallError: 'Fired when a phone call could not be processed.',
+    evConvProcessed: 'Fired when a written conversation (e.g. WhatsApp) was analyzed.',
+    evMsgCreated: 'Fired when a message is received or sent in a written conversation.',
+    // Error causes
+    errCausesTitle: 'Possible error_cause values',
+    // Footer
+    footerCopy: '© 2025 diio. API v1.0',
+    footerLink: 'diio.com →',
+  },
+  es: {
+    apiDocs: 'API Docs',
+    navOverview: 'Resumen', navGettingStarted: 'Comenzando', navAuth: 'Autenticación',
+    navRestApi: 'REST API', navAuthEp: 'Autenticación', navExports: 'Exportaciones', navMeetings: 'Reuniones',
+    navCalls: 'Llamadas', navPlaybooks: 'Playbooks', navTranscripts: 'Transcripciones',
+    navUsers: 'Usuarios', navWebhooks: 'Webhooks', navWHSetup: 'Configuración y Validación',
+    navWHSig: 'Verificación de Firma', navWHEvents: 'Referencia de Eventos',
+    heroTitle: 'Documentación de la API de diio',
+    heroSub: 'Integra tus sistemas con diio — reuniones, llamadas telefónicas, exportaciones, transcripciones, playbooks y más.',
+    heroV1: 'REST API v1.0', heroJson: 'JSON', heroBearer: 'Autenticación JWT Bearer',
+    gsTitle: 'Comenzando',
+    gsDesc: 'La API de diio te permite acceder de forma programática a los datos de tu cuenta. Todas las solicitudes se realizan a:',
+    gsDesc2: 'Todas las solicitudes deben incluir el encabezado <code class="ic">Authorization</code> con un JWT Bearer token válido. Los tokens expiran después de 1 hora.',
+    gsContentType: 'Todos los cuerpos de solicitud y respuesta usan <code class="ic">application/json</code>.',
+    authTitle: 'Autenticación',
+    authDesc: 'diio usa JWT Bearer tokens. Los tokens son válidos por 1 hora. Cuando un token expira (401), usa tu <code class="ic">refresh_token</code> para obtener uno nuevo.',
+    authCreds: 'Tus credenciales de API:',
+    authCred1: '<code class="ic">client_id</code> — tu identificador de cliente API',
+    authCred2: '<code class="ic">client_secret</code> — tu secreto de cliente API',
+    authCred3: '<code class="ic">refresh_token</code> — token de larga duración para obtener nuevos tokens de acceso',
+    authHeaderLabel: 'Incluye tu token de acceso en cada solicitud:',
+    lReqBody: 'Cuerpo de la Solicitud', lPathParams: 'Parámetros de Ruta', lQueryParams: 'Parámetros de Consulta',
+    lHeaders: 'Encabezados', lResponses: 'Respuestas', lRequired: 'requerido', lOptional: 'opcional',
+    lName: 'Nombre', lType: 'Tipo', lDesc: 'Descripción', lExample: 'Ejemplo',
+    lExReq: 'Ejemplo de Solicitud', lExRes: 'Ejemplo de Respuesta',
+    epRefreshSum: 'Actualizar token de acceso', epCreateExportSum: 'Crear exportación', epGetExportSum: 'Estado de exportación',
+    epListMeetingsSum: 'Listar reuniones', epGetMeetingSum: 'Obtener reunión',
+    epCreateCallSum: 'Crear llamada telefónica', epListCallsSum: 'Listar llamadas',
+    epGetCallSum: 'Obtener llamada', epUpdateCallSum: 'Actualizar llamada',
+    epListPlaybooksSum: 'Listar playbooks', epGetPlaybookSum: 'Obtener playbook',
+    epGetTranscriptSum: 'Obtener transcripción', epListUsersSum: 'Listar usuarios',
+    epRefreshDesc: 'Actualiza y devuelve un nuevo JWT access_token. Llama a este endpoint cuando tu token actual haya expirado (respuesta 401). Este endpoint <strong>no</strong> requiere autenticación.',
+    epCreateExportDesc: 'Crea una exportación de datos en formato JSON o CSV. Opcionalmente envía el archivo a un correo electrónico. Devuelve un ID de exportación para consultar el estado.',
+    epGetExportDesc: 'Devuelve el estado de una exportación creada previamente. Consulta hasta que el estado sea <code class="ic">finished</code> y haya una <code class="ic">file_url</code> disponible.',
+    epListMeetingsDesc: 'Devuelve una lista paginada de todas las reuniones en tu cuenta diio.',
+    epGetMeetingDesc: 'Devuelve información detallada de una reunión específica por UUID.',
+    epCreateCallDesc: 'Crea un registro de Llamada Telefónica en diio para análisis de IA. Proporciona la URL de la grabación, duración y datos de los participantes.',
+    epListCallsDesc: 'Devuelve una lista paginada de todas las llamadas telefónicas en tu cuenta diio.',
+    epGetCallDesc: 'Devuelve información detallada de una llamada telefónica específica.',
+    epUpdateCallDesc: 'Actualiza la información de un registro específico de llamada telefónica. Todos los campos del cuerpo son opcionales.',
+    epListPlaybooksDesc: 'Devuelve una lista paginada de todos los playbooks en tu cuenta diio.',
+    epGetPlaybookDesc: 'Devuelve información detallada de un playbook específico, incluyendo sus definiciones de trackers.',
+    epGetTranscriptDesc: 'Devuelve la transcripción de una reunión o llamada telefónica. Opcionalmente filtra el contenido por email de usuario.',
+    epListUsersDesc: 'Devuelve una lista de todos los usuarios en tu cuenta diio. Límite: 10 por página. Se puede filtrar por email.',
+    pPage: 'Número de página.', pLimit: 'Resultados por página.', pEmail: 'Filtrar por email de usuario.',
+    pExportId: 'UUID de la exportación devuelta por POST /v1/exports.',
+    pMeetingId: 'UUID de la reunión.', pCallId: 'UUID de la llamada telefónica.',
+    pPlaybookId: 'UUID del playbook.', pTranscriptId: 'UUID de la transcripción.',
+    pTranscriptEmail: 'Filtrar contenido de transcripción por email de usuario.',
+    pFileType: 'Formato de exportación.', pSendTo: 'Correo electrónico al que enviar el archivo.',
+    pModel: 'Tipo de datos a exportar.', pName: 'Nombre de visualización.',
+    pMediaUrl: 'URL donde diio puede descargar la grabación de la llamada.',
+    pDuration: 'Duración de la llamada en segundos.',
+    pUserId: 'UUID del usuario de diio asociado a la llamada.',
+    pCallFromNumber: 'Número de teléfono desde el que se realizó la llamada.',
+    pCustomerName: 'Nombre del cliente.',
+    pCustomerEmail: 'Correo electrónico del cliente.',
+    pCustomerPhone: 'Número de teléfono del cliente.',
+    pOccurredAt: 'Fecha y hora UTC en que ocurrió la llamada.',
+    r200Refresh: 'Nuevo access_token devuelto exitosamente.',
+    r200Export: 'Exportación creada. Devuelve el ID de exportación.',
+    r200ExportGet: 'Estado de exportación devuelto.',
+    r200List: 'Lista devuelta exitosamente.',
+    r200Detail: 'Detalles del objeto devueltos.',
+    r200Create: 'Creado exitosamente. Devuelve el ID del nuevo objeto.',
+    r200Update: 'Actualizado exitosamente.',
+    r400: 'Solicitud malformada o parámetros requeridos faltantes.',
+    r401: 'access_token inválido o expirado.',
+    r402: 'Cuenta desactivada. Contacta a support@diio.com.',
+    r404: 'Recurso no encontrado.',
+    r500: 'Error inesperado del servidor.',
+    whTitle: 'Webhooks',
+    whIntro: 'Los webhooks permiten que diio envíe notificaciones en tiempo real a tu servidor cuando ocurren eventos en tu cuenta. En lugar de consultar la API, tu endpoint recibe solicitudes POST automáticamente.',
+    whSetupTitle: 'Configuración y Validación',
+    whSetupDesc: 'Para configurar webhooks, ve a <strong>Configuración de Empresa → Integraciones → Webhooks</strong> y haz clic en <strong>"Nuevo Webhook"</strong>.',
+    whValidTitle: 'Validación del Endpoint',
+    whValidDesc: 'Antes de recibir eventos, diio valida tu endpoint con una solicitud GET. Tu servidor debe responder con el valor de <code class="ic">echo_string</code> en texto plano:',
+    whSigTitle: 'Verificación de Firma',
+    whSigDesc: 'Cada solicitud webhook incluye los encabezados <code class="ic">DO-Signature</code> y <code class="ic">DO-Timestamp</code>. Verifica la autenticidad usando HMAC-SHA256:',
+    whSigSecret: 'Tu secreto de firma se muestra en la configuración del webhook (haz clic en el ícono de ojo junto al webhook).',
+    whEventsTitle: 'Referencia de Eventos',
+    whEventsDesc: 'Suscríbete a cualquier combinación de estos eventos al crear o editar un webhook.',
+    evMeetingInProgress: 'Se activa cuando una reunión está ocurriendo activamente.',
+    evMeetingPending: 'Se activa cuando una reunión está programada y esperando comenzar.',
+    evMeetingFinished: 'Se activa cuando una reunión finalizó y fue analizada.',
+    evMeetingError: 'Se activa cuando una reunión no pudo ser procesada.',
+    evCallInProgress: 'Se activa cuando una llamada telefónica está siendo procesada.',
+    evCallPending: 'Se activa cuando una llamada está en cola para procesamiento.',
+    evCallFinished: 'Se activa cuando una llamada telefónica fue analizada.',
+    evCallError: 'Se activa cuando una llamada no pudo ser procesada.',
+    evConvProcessed: 'Se activa cuando una conversación escrita (ej. WhatsApp) fue analizada.',
+    evMsgCreated: 'Se activa cuando se recibe o envía un mensaje en una conversación escrita.',
+    errCausesTitle: 'Valores posibles de error_cause',
+    footerCopy: '© 2025 diio. API v1.0',
+    footerLink: 'diio.com →',
+  },
+  pt: {
+    apiDocs: 'API Docs',
+    navOverview: 'Visão Geral', navGettingStarted: 'Primeiros Passos', navAuth: 'Autenticação',
+    navRestApi: 'REST API', navAuthEp: 'Autenticação', navExports: 'Exportações', navMeetings: 'Reuniões',
+    navCalls: 'Ligações', navPlaybooks: 'Playbooks', navTranscripts: 'Transcrições',
+    navUsers: 'Usuários', navWebhooks: 'Webhooks', navWHSetup: 'Configuração e Validação',
+    navWHSig: 'Verificação de Assinatura', navWHEvents: 'Referência de Eventos',
+    heroTitle: 'Documentação da API do diio',
+    heroSub: 'Integre seus sistemas com o diio — reuniões, ligações telefônicas, exportações, transcrições, playbooks e muito mais.',
+    heroV1: 'REST API v1.0', heroJson: 'JSON', heroBearer: 'Autenticação JWT Bearer',
+    gsTitle: 'Primeiros Passos',
+    gsDesc: 'A API do diio permite acessar dados da sua conta de forma programática. Todas as requisições são feitas para:',
+    gsDesc2: 'Todas as requisições devem incluir o header <code class="ic">Authorization</code> com um JWT Bearer token válido. Os tokens expiram após 1 hora.',
+    gsContentType: 'Todos os corpos de requisição e resposta usam <code class="ic">application/json</code>.',
+    authTitle: 'Autenticação',
+    authDesc: 'O diio usa JWT Bearer tokens. Os tokens são válidos por 1 hora. Quando um token expirar (401), use seu <code class="ic">refresh_token</code> para obter um novo.',
+    authCreds: 'Suas credenciais de API:',
+    authCred1: '<code class="ic">client_id</code> — seu identificador de cliente API',
+    authCred2: '<code class="ic">client_secret</code> — seu segredo de cliente API',
+    authCred3: '<code class="ic">refresh_token</code> — token de longa duração para obter novos tokens de acesso',
+    authHeaderLabel: 'Inclua seu token de acesso em cada requisição:',
+    lReqBody: 'Corpo da Requisição', lPathParams: 'Parâmetros de Caminho', lQueryParams: 'Parâmetros de Consulta',
+    lHeaders: 'Cabeçalhos', lResponses: 'Respostas', lRequired: 'obrigatório', lOptional: 'opcional',
+    lName: 'Nome', lType: 'Tipo', lDesc: 'Descrição', lExample: 'Exemplo',
+    lExReq: 'Exemplo de Requisição', lExRes: 'Exemplo de Resposta',
+    epRefreshSum: 'Atualizar token de acesso', epCreateExportSum: 'Criar exportação', epGetExportSum: 'Status da exportação',
+    epListMeetingsSum: 'Listar reuniões', epGetMeetingSum: 'Obter reunião',
+    epCreateCallSum: 'Criar ligação telefônica', epListCallsSum: 'Listar ligações',
+    epGetCallSum: 'Obter ligação', epUpdateCallSum: 'Atualizar ligação',
+    epListPlaybooksSum: 'Listar playbooks', epGetPlaybookSum: 'Obter playbook',
+    epGetTranscriptSum: 'Obter transcrição', epListUsersSum: 'Listar usuários',
+    epRefreshDesc: 'Atualiza e retorna um novo JWT access_token. Chame este endpoint quando seu token atual expirar (resposta 401). Este endpoint <strong>não</strong> requer autenticação.',
+    epCreateExportDesc: 'Cria uma exportação de dados em formato JSON ou CSV. Opcionalmente envia o arquivo para um e-mail. Retorna um ID de exportação para verificar o status.',
+    epGetExportDesc: 'Retorna o status de uma exportação criada anteriormente. Consulte até que o status seja <code class="ic">finished</code> e uma <code class="ic">file_url</code> esteja disponível.',
+    epListMeetingsDesc: 'Retorna uma lista paginada de todas as reuniões na sua conta diio.',
+    epGetMeetingDesc: 'Retorna informações detalhadas de uma reunião específica pelo UUID.',
+    epCreateCallDesc: 'Cria um registro de Ligação Telefônica no diio para análise de IA. Forneça a URL da gravação, duração e dados dos participantes.',
+    epListCallsDesc: 'Retorna uma lista paginada de todas as ligações telefônicas na sua conta diio.',
+    epGetCallDesc: 'Retorna informações detalhadas de uma ligação telefônica específica.',
+    epUpdateCallDesc: 'Atualiza as informações de um registro específico de ligação telefônica. Todos os campos do corpo são opcionais.',
+    epListPlaybooksDesc: 'Retorna uma lista paginada de todos os playbooks na sua conta diio.',
+    epGetPlaybookDesc: 'Retorna informações detalhadas de um playbook específico, incluindo suas definições de trackers.',
+    epGetTranscriptDesc: 'Retorna a transcrição de uma reunião ou ligação telefônica. Opcionalmente filtra o conteúdo por e-mail do usuário.',
+    epListUsersDesc: 'Retorna uma lista de todos os usuários na sua conta diio. Limite: 10 por página. Filtrável por e-mail.',
+    pPage: 'Número da página.', pLimit: 'Resultados por página.', pEmail: 'Filtrar por e-mail do usuário.',
+    pExportId: 'UUID da exportação retornado pelo POST /v1/exports.',
+    pMeetingId: 'UUID da reunião.', pCallId: 'UUID da ligação telefônica.',
+    pPlaybookId: 'UUID do playbook.', pTranscriptId: 'UUID da transcrição.',
+    pTranscriptEmail: 'Filtrar conteúdo da transcrição por e-mail do usuário.',
+    pFileType: 'Formato de exportação.', pSendTo: 'E-mail para enviar o arquivo de exportação.',
+    pModel: 'Tipo de dados a exportar.', pName: 'Nome de exibição.',
+    pMediaUrl: 'URL onde o diio pode baixar a gravação da ligação.',
+    pDuration: 'Duração da ligação em segundos.',
+    pUserId: 'UUID do usuário do diio associado à ligação.',
+    pCallFromNumber: 'Número de telefone do qual a ligação foi feita.',
+    pCustomerName: 'Nome do cliente.',
+    pCustomerEmail: 'E-mail do cliente.',
+    pCustomerPhone: 'Número de telefone do cliente.',
+    pOccurredAt: 'Data e hora UTC em que a ligação ocorreu.',
+    r200Refresh: 'Novo access_token retornado com sucesso.',
+    r200Export: 'Exportação criada. Retorna o ID da exportação.',
+    r200ExportGet: 'Status da exportação retornado.',
+    r200List: 'Lista retornada com sucesso.',
+    r200Detail: 'Detalhes do objeto retornados.',
+    r200Create: 'Criado com sucesso. Retorna o ID do novo objeto.',
+    r200Update: 'Atualizado com sucesso.',
+    r400: 'Requisição malformada ou parâmetros obrigatórios ausentes.',
+    r401: 'access_token inválido ou expirado.',
+    r402: 'Conta desativada. Contate support@diio.com.',
+    r404: 'Recurso não encontrado.',
+    r500: 'Erro inesperado do servidor.',
+    whTitle: 'Webhooks',
+    whIntro: 'Os webhooks permitem que o diio envie notificações em tempo real para seu servidor quando eventos ocorrem na sua conta. Em vez de consultar a API, seu endpoint recebe requisições POST automaticamente.',
+    whSetupTitle: 'Configuração e Validação',
+    whSetupDesc: 'Para configurar webhooks, acesse <strong>Configurações da Empresa → Integrações → Webhooks</strong> e clique em <strong>"Novo Webhook"</strong>.',
+    whValidTitle: 'Validação do Endpoint',
+    whValidDesc: 'Antes de receber eventos, o diio valida seu endpoint com uma requisição GET. Seu servidor deve responder com o valor de <code class="ic">echo_string</code> em texto simples:',
+    whSigTitle: 'Verificação de Assinatura',
+    whSigDesc: 'Cada requisição webhook inclui os headers <code class="ic">DO-Signature</code> e <code class="ic">DO-Timestamp</code>. Verifique a autenticidade usando HMAC-SHA256:',
+    whSigSecret: 'Seu segredo de assinatura é mostrado na configuração do webhook (clique no ícone de olho ao lado do webhook).',
+    whEventsTitle: 'Referência de Eventos',
+    whEventsDesc: 'Assine qualquer combinação desses eventos ao criar ou editar um webhook.',
+    evMeetingInProgress: 'Acionado quando uma reunião está ocorrendo ativamente.',
+    evMeetingPending: 'Acionado quando uma reunião está agendada e aguardando início.',
+    evMeetingFinished: 'Acionado quando uma reunião foi concluída e analisada.',
+    evMeetingError: 'Acionado quando uma reunião não pôde ser processada.',
+    evCallInProgress: 'Acionado quando uma ligação telefônica está sendo processada.',
+    evCallPending: 'Acionado quando uma ligação está na fila para processamento.',
+    evCallFinished: 'Acionado quando uma ligação telefônica foi analisada.',
+    evCallError: 'Acionado quando uma ligação não pôde ser processada.',
+    evConvProcessed: 'Acionado quando uma conversa escrita (ex: WhatsApp) foi analisada.',
+    evMsgCreated: 'Acionado quando uma mensagem é recebida ou enviada em uma conversa escrita.',
+    errCausesTitle: 'Valores possíveis de error_cause',
+    footerCopy: '© 2025 diio. API v1.0',
+    footerLink: 'diio.com →',
+  }
+};
+
+// ─── ENDPOINT DATA ─────────────────────────────────────────────────────────────
+function getEndpoints(lang) {
+  const t = T[lang];
+  const stdErrors = [
+    { code: '400', cls: 's400', desc: t.r400 },
+    { code: '401', cls: 's401', desc: t.r401 },
+    { code: '402', cls: 's402', desc: t.r402 },
+    { code: '500', cls: 's500', desc: t.r500 },
+  ];
+  const stdErrors404 = [
+    { code: '400', cls: 's400', desc: t.r400 },
+    { code: '401', cls: 's401', desc: t.r401 },
+    { code: '402', cls: 's402', desc: t.r402 },
+    { code: '404', cls: 's404', desc: t.r404 },
+    { code: '500', cls: 's500', desc: t.r500 },
+  ];
+  return {
+    auth: [{
+      id: 'ep-refresh', method: 'POST', path: '/refresh_token', noAuth: true,
+      sum: t.epRefreshSum, desc: t.epRefreshDesc,
+      body: [
+        { name: 'client_id', type: 'string', req: true, desc: 'Your client ID', ex: 'your-client-id' },
+        { name: 'client_secret', type: 'string', req: true, desc: 'Your client secret', ex: 'your-client-secret' },
+        { name: 'refresh_token', type: 'string', req: true, desc: 'Your refresh token', ex: 'your-refresh-token' },
+      ],
+      curl: `curl -X POST https://your-company.diio.com/api/external/refresh_token \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "client_id": "your-client-id",
+    "client_secret": "your-client-secret",
+    "refresh_token": "your-refresh-token"
+  }'`,
+      resExample: `{\n  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."\n}`,
+      responses: [{ code: '200', cls: 's200', desc: t.r200Refresh }, { code: '401', cls: 's401', desc: t.r401 }]
+    }],
+    exports: [
+      {
+        id: 'ep-create-export', method: 'POST', path: '/v1/exports',
+        sum: t.epCreateExportSum, desc: t.epCreateExportDesc,
+        body: [
+          { name: 'file_type', type: 'string', req: true, desc: t.pFileType + ' <code class="ic">csv</code> | <code class="ic">json</code>', ex: 'json' },
+          { name: 'send_to', type: 'string (email)', req: false, desc: t.pSendTo, ex: 'john@doe.com' },
+          { name: 'model', type: 'string', req: false, desc: t.pModel + ' <code class="ic">meeting</code> | <code class="ic">phone_call</code>. Default: <code class="ic">meeting</code>', ex: 'phone_call' },
+        ],
+        curl: `curl -X POST https://your-company.diio.com/api/external/v1/exports \\
+  -H "Authorization: Bearer <access_token>" \\
+  -H "Content-Type: application/json" \\
+  -d '{"file_type": "json", "send_to": "john@doe.com", "model": "phone_call"}'`,
+        resExample: `{\n  "id": "343f605a-0bde-11f0-a454-06254876e271"\n}`,
+        responses: [{ code: '200', cls: 's200', desc: t.r200Export }, ...stdErrors]
+      },
+      {
+        id: 'ep-get-export', method: 'GET', path: '/v1/exports/{uuid}',
+        sum: t.epGetExportSum, desc: t.epGetExportDesc,
+        pathParams: [{ name: 'uuid', type: 'string (uuid)', req: true, desc: t.pExportId, ex: '343f605a-0bde-11f0-a454-06254876e271' }],
+        curl: `curl https://your-company.diio.com/api/external/v1/exports/343f605a-0bde-11f0-a454-06254876e271 \\
+  -H "Authorization: Bearer <access_token>"`,
+        resExample: `{\n  "id": "343f605a-0bde-11f0-a454-06254876e271",\n  "file_url": "https://example.com/343f605a....json",\n  "email": "john@doe.com",\n  "status": "finished",\n  "created_at": "2025-01-01T01:01:01Z"\n}`,
+        responses: [{ code: '200', cls: 's200', desc: t.r200ExportGet }, ...stdErrors404]
+      }
+    ],
+    meetings: [
+      {
+        id: 'ep-list-meetings', method: 'GET', path: '/v1/meetings',
+        sum: t.epListMeetingsSum, desc: t.epListMeetingsDesc,
+        queryParams: [
+          { name: 'page', type: 'integer', req: false, desc: t.pPage, ex: '1' },
+          { name: 'limit', type: 'integer', req: false, desc: t.pLimit, ex: '20' },
+        ],
+        curl: `curl "https://your-company.diio.com/api/external/v1/meetings?page=1&limit=20" \\
+  -H "Authorization: Bearer <access_token>"`,
+        resExample: `{\n  "meetings": [\n    {\n      "id": "343f605a-0bde-11f0-a454-06254876e271",\n      "name": "Meeting with John",\n      "scheduled_at": "2025-10-01T15:10:05",\n      "created_at": "2025-10-01T15:10:05"\n    }\n  ],\n  "total": 1000,\n  "next": 2\n}`,
+        responses: [{ code: '200', cls: 's200', desc: t.r200List }, ...stdErrors]
+      },
+      {
+        id: 'ep-get-meeting', method: 'GET', path: '/v1/meetings/{id}',
+        sum: t.epGetMeetingSum, desc: t.epGetMeetingDesc,
+        pathParams: [{ name: 'id', type: 'string (uuid)', req: true, desc: t.pMeetingId, ex: '343f605a-0bde-11f0-a454-06254876e271' }],
+        curl: `curl "https://your-company.diio.com/api/external/v1/meetings/343f605a-0bde-11f0-a454-06254876e271" \\
+  -H "Authorization: Bearer <access_token>"`,
+        resExample: `{\n  "id": "343f605a-0bde-11f0-a454-06254876e271",\n  "name": "Meeting with John",\n  "scheduled_at": "2025-10-01T15:10:05",\n  "analyzed_status": "finished",\n  "error_cause": null,\n  "attendees": { "sellers": [...], "customers": [...] },\n  "participants": [...]\n}`,
+        responses: [{ code: '200', cls: 's200', desc: t.r200Detail }, ...stdErrors404]
+      }
+    ],
+    phone_calls: [
+      {
+        id: 'ep-create-call', method: 'POST', path: '/v1/phone_calls',
+        sum: t.epCreateCallSum, desc: t.epCreateCallDesc,
+        body: [
+          { name: 'name', type: 'string', req: true, desc: t.pName, ex: 'Call with John' },
+          { name: 'media_url', type: 'string (uri)', req: true, desc: t.pMediaUrl, ex: 'https://example.com/call.mp3' },
+          { name: 'duration', type: 'integer', req: true, desc: t.pDuration, ex: '600' },
+          { name: 'user_id', type: 'string (uuid)', req: true, desc: t.pUserId, ex: 'c2d83840-fb6d-11ef-b70f-06254876e271' },
+          { name: 'call_from_number', type: 'string', req: true, desc: t.pCallFromNumber, ex: '+130512341234' },
+          { name: 'customer_name', type: 'string', req: true, desc: t.pCustomerName, ex: 'John Doe' },
+          { name: 'customer_email', type: 'string (email)', req: true, desc: t.pCustomerEmail, ex: 'john@doe.com' },
+          { name: 'customer_phone', type: 'string', req: true, desc: t.pCustomerPhone, ex: '+130543214321' },
+          { name: 'occurred_at', type: 'string (date-time)', req: true, desc: t.pOccurredAt, ex: '2025-10-01T15:10:05' },
+        ],
+        curl: `curl -X POST https://your-company.diio.com/api/external/v1/phone_calls \\
+  -H "Authorization: Bearer <access_token>" \\
+  -H "Content-Type: application/json" \\
+  -d '{\n    "name": "Call with John",\n    "media_url": "https://example.com/call.mp3",\n    "duration": 600,\n    "user_id": "c2d83840-fb6d-11ef-b70f-06254876e271",\n    "call_from_number": "+130512341234",\n    "customer_name": "John Doe",\n    "customer_email": "john@doe.com",\n    "customer_phone": "+130543214321",\n    "occurred_at": "2025-10-01T15:10:05"\n  }'`,
+        resExample: `{\n  "id": "343f605a-0bde-11f0-a454-06254876e271"\n}`,
+        responses: [{ code: '200', cls: 's200', desc: t.r200Create }, ...stdErrors]
+      },
+      {
+        id: 'ep-list-calls', method: 'GET', path: '/v1/phone_calls',
+        sum: t.epListCallsSum, desc: t.epListCallsDesc,
+        queryParams: [
+          { name: 'page', type: 'integer', req: false, desc: t.pPage, ex: '1' },
+          { name: 'limit', type: 'integer', req: false, desc: t.pLimit, ex: '20' },
+        ],
+        curl: `curl "https://your-company.diio.com/api/external/v1/phone_calls?page=1&limit=20" \\
+  -H "Authorization: Bearer <access_token>"`,
+        resExample: `{\n  "phone_calls": [\n    {\n      "id": "343f605a-0bde-11f0-a454-06254876e271",\n      "name": "Call with John",\n      "occurred_at": "2025-10-01T15:10:05"\n    }\n  ],\n  "total": 1000,\n  "next": 2\n}`,
+        responses: [{ code: '200', cls: 's200', desc: t.r200List }, ...stdErrors]
+      },
+      {
+        id: 'ep-get-call', method: 'GET', path: '/v1/phone_calls/{id}',
+        sum: t.epGetCallSum, desc: t.epGetCallDesc,
+        pathParams: [{ name: 'id', type: 'string (uuid)', req: true, desc: t.pCallId, ex: '343f605a-0bde-11f0-a454-06254876e271' }],
+        curl: `curl "https://your-company.diio.com/api/external/v1/phone_calls/343f605a-0bde-11f0-a454-06254876e271" \\
+  -H "Authorization: Bearer <access_token>"`,
+        resExample: `{\n  "id": "343f605a-0bde-11f0-a454-06254876e271",\n  "name": "Call with John",\n  "analyzed_status": "finished",\n  "error_cause": null,\n  "attendees": { "sellers": [...], "customers": [...] }\n}`,
+        responses: [{ code: '200', cls: 's200', desc: t.r200Detail }, ...stdErrors404]
+      },
+      {
+        id: 'ep-update-call', method: 'PUT', path: '/v1/phone_calls/{id}',
+        sum: t.epUpdateCallSum, desc: t.epUpdateCallDesc,
+        pathParams: [{ name: 'id', type: 'string (uuid)', req: true, desc: t.pCallId, ex: '343f605a-0bde-11f0-a454-06254876e271' }],
+        body: [
+          { name: 'name', type: 'string', req: false, desc: t.pName, ex: 'Call with John - updated' },
+          { name: 'media_url', type: 'string (uri)', req: false, desc: t.pMediaUrl, ex: 'https://example.com/new.mp3' },
+          { name: 'call_from_number', type: 'string', req: false, desc: t.pCallFromNumber, ex: '+130512341234' },
+          { name: 'customer_name', type: 'string', req: false, desc: t.pCustomerName, ex: 'John Doe' },
+          { name: 'customer_email', type: 'string (email)', req: false, desc: t.pCustomerEmail, ex: 'john@doe.com' },
+          { name: 'customer_phone', type: 'string', req: false, desc: t.pCustomerPhone, ex: '+130543214321' },
+        ],
+        curl: `curl -X PUT https://your-company.diio.com/api/external/v1/phone_calls/343f605a-0bde-11f0-a454-06254876e271 \\
+  -H "Authorization: Bearer <access_token>" \\
+  -H "Content-Type: application/json" \\
+  -d '{"name": "Call with John - updated"}'`,
+        resExample: `{\n  "id": "343f605a-0bde-11f0-a454-06254876e271"\n}`,
+        responses: [{ code: '200', cls: 's200', desc: t.r200Update }, ...stdErrors404]
+      }
+    ],
+    playbooks: [
+      {
+        id: 'ep-list-playbooks', method: 'GET', path: '/v1/playbooks',
+        sum: t.epListPlaybooksSum, desc: t.epListPlaybooksDesc,
+        queryParams: [
+          { name: 'page', type: 'integer', req: false, desc: t.pPage, ex: '1' },
+          { name: 'limit', type: 'integer', req: false, desc: t.pLimit, ex: '20' },
+        ],
+        curl: `curl "https://your-company.diio.com/api/external/v1/playbooks?page=1&limit=20" \\
+  -H "Authorization: Bearer <access_token>"`,
+        resExample: `{\n  "playbooks": [\n    {\n      "id": "343f605a-0bde-11f0-a454-06254876e271",\n      "name": "Sales Playbook",\n      "version": 3,\n      "model_type": "any",\n      "language": "es"\n    }\n  ],\n  "total": 10,\n  "next": null\n}`,
+        responses: [{ code: '200', cls: 's200', desc: t.r200List }, ...stdErrors]
+      },
+      {
+        id: 'ep-get-playbook', method: 'GET', path: '/v1/playbooks/{id}',
+        sum: t.epGetPlaybookSum, desc: t.epGetPlaybookDesc,
+        pathParams: [{ name: 'id', type: 'string (uuid)', req: true, desc: t.pPlaybookId, ex: '343f605a-0bde-11f0-a454-06254876e271' }],
+        curl: `curl "https://your-company.diio.com/api/external/v1/playbooks/343f605a-0bde-11f0-a454-06254876e271" \\
+  -H "Authorization: Bearer <access_token>"`,
+        resExample: `{\n  "id": "343f605a-0bde-11f0-a454-06254876e271",\n  "name": "Sales Playbook",\n  "version": 3,\n  "model_type": "any",\n  "language": "es",\n  "description": "Main sales playbook",\n  "trackers": [...]\n}`,
+        responses: [{ code: '200', cls: 's200', desc: t.r200Detail }, ...stdErrors404]
+      }
+    ],
+    transcripts: [{
+      id: 'ep-get-transcript', method: 'GET', path: '/v1/transcripts/{id}',
+      sum: t.epGetTranscriptSum, desc: t.epGetTranscriptDesc,
+      pathParams: [{ name: 'id', type: 'string (uuid)', req: true, desc: t.pTranscriptId, ex: '91992f26-a585-11ee-bc7e-06d5ade5f257' }],
+      queryParams: [{ name: 'email', type: 'string (email)', req: false, desc: t.pTranscriptEmail, ex: 'john@doe.com' }],
+      curl: `curl "https://your-company.diio.com/api/external/v1/transcripts/91992f26-a585-11ee-bc7e-06d5ade5f257" \\
+  -H "Authorization: Bearer <access_token>"`,
+      resExample: `{\n  "id": "91992f26-a585-11ee-bc7e-06d5ade5f257",\n  "transcript": "John: Hello, I'd like to know more about..."\n}`,
+      responses: [{ code: '200', cls: 's200', desc: t.r200Detail }, ...stdErrors404]
+    }],
+    users: [{
+      id: 'ep-list-users', method: 'GET', path: '/v1/users',
+      sum: t.epListUsersSum, desc: t.epListUsersDesc,
+      queryParams: [
+        { name: 'page', type: 'integer', req: false, desc: t.pPage + ' (10 per page)', ex: '1' },
+        { name: 'email', type: 'string (email)', req: false, desc: t.pEmail, ex: 'john@doe.com' },
+      ],
+      curl: `curl "https://your-company.diio.com/api/external/v1/users?page=1" \\
+  -H "Authorization: Bearer <access_token>"`,
+      resExample: `{\n  "users": [\n    { "id": "91992f26-a585-11ee-bc7e-06d5ade5f257", "name": "John Doe", "email": "john@doe.com" },\n    { "id": "0b3e264a-9b83-11ee-9bd5-06d5ade5f257", "name": "Jane Doe", "email": "jane@doe.com" }\n  ]\n}`,
+      responses: [{ code: '200', cls: 's200', desc: t.r200List }, ...stdErrors404]
+    }]
+  };
+}
+
+// ─── WEBHOOK EVENTS ────────────────────────────────────────────────────────────
+function getEvents(lang) {
+  const t = T[lang];
+  return [
+    {
+      action: 'meeting.in_progress', desc: t.evMeetingInProgress,
+      payload: `{\n  "action": "meeting.in_progress",\n  "id": "7b292f4a-90a1-11ef-9462-0a0ddbb5e2f5",\n  "name": "Example Meeting",\n  "scheduled_at": "2024-10-22T18:15:00+0000",\n  "attendees_tracker": [\n    { "join": "2024-10-22T18:15:20Z", "name": "John Doe", "is_host": true }\n  ],\n  "analyzed_status": "in_progress",\n  "error_cause": null\n}`
+    },
+    {
+      action: 'meeting.pending', desc: t.evMeetingPending,
+      payload: `{\n  "action": "meeting.pending",\n  "id": "7b292f4a-90a1-11ef-9462-0a0ddbb5e2f5",\n  "name": "Upcoming Meeting",\n  "scheduled_at": "2024-10-23T10:00:00+0000",\n  "attendees_tracker": [],\n  "analyzed_status": "pending",\n  "error_cause": null\n}`
+    },
+    {
+      action: 'meeting.finished', desc: t.evMeetingFinished,
+      payload: `{\n  "action": "meeting.finished",\n  "id": "415b1e52-bc8b-11ef-94d3-06c15ad63b85",\n  "name": "Sales Call Q4",\n  "scheduled_at": "2024-12-17T15:30:00Z",\n  "analyzed_status": "finished",\n  "error_cause": null,\n  "duration": 107,\n  "attendees": {\n    "sellers": [{ "name": "John Doe", "email": "john@company.com", "user_id": "uuid..." }],\n    "customers": [{ "name": "Jane Client", "email": "jane@client.com" }]\n  },\n  "tracker_values": {\n    "summary": { "type": "string", "value": "Meeting summary text..." },\n    "sentiment": { "type": "integer", "value": 4 },\n    "success_odds": { "type": "integer", "value": 3 }\n  },\n  "playbook": { "name": "Sales", "version": 49 }\n}`
+    },
+    {
+      action: 'meeting.error', desc: t.evMeetingError,
+      payload: `{\n  "action": "meeting.error",\n  "id": "uuid...",\n  "name": "Meeting name",\n  "scheduled_at": "2024-12-17T15:30:00Z",\n  "analyzed_status": "error",\n  "error_cause": "couldnt_be_transcribed"\n}`,
+      errorCauses: ['without_start_time','recurring_event','without_external_participants','meeting_without_conference_url','too_many_sellers','user_without_seat','bot_errored','bot_errored_by_platform','bot_cant_enter_meeting','no_participants_or_host','bot_not_accepted','recording_permission_denied','couldnt_download_video','couldnt_be_transcribed','blank_transcript','transcript_too_short','couldnt_find_playbook','meeting_already_started_or_ended','meeting_manually_deactivated']
+    },
+    {
+      action: 'phone_call.in_progress', desc: t.evCallInProgress,
+      payload: `{\n  "action": "phone_call.in_progress",\n  "id": "8e762d54-90a7-11ef-b0af-0a0ddbb5e2f5",\n  "name": "Call with Jane",\n  "ocurred_at": "2024-10-22T18:54:16+0000",\n  "analyzed_status": "in_progress",\n  "error_cause": null\n}`
+    },
+    {
+      action: 'phone_call.pending', desc: t.evCallPending,
+      payload: `{\n  "action": "phone_call.pending",\n  "id": "uuid...",\n  "name": "Pending Call",\n  "ocurred_at": "2024-10-22T18:54:16+0000",\n  "analyzed_status": "pending",\n  "error_cause": null\n}`
+    },
+    {
+      action: 'phone_call.finished', desc: t.evCallFinished,
+      payload: `{\n  "action": "phone_call.finished",\n  "id": "8e762d54-90a7-11ef-b0af-0a0ddbb5e2f5",\n  "name": "Sales Call",\n  "ocurred_at": "2024-10-22T18:54:16+0000",\n  "analyzed_status": "finished",\n  "error_cause": null,\n  "tracker_values": {\n    "sentiment": { "type": "integer", "value": 3 },\n    "success_odds": { "type": "integer", "value": 4 }\n  },\n  "playbook": { "name": "Sales", "version": 49 }\n}`
+    },
+    {
+      action: 'phone_call.error', desc: t.evCallError,
+      payload: `{\n  "action": "phone_call.error",\n  "id": "uuid...",\n  "name": "Call name",\n  "ocurred_at": "2024-10-22T18:54:16+0000",\n  "analyzed_status": "error",\n  "error_cause": "voicemail"\n}`,
+      errorCauses: ['couldnt_download_audio','couldnt_be_transcribed','blank_transcript','transcript_too_short','couldnt_find_playbook','voicemail','wrong_number','rejected','reschedule_request']
+    },
+    {
+      action: 'written_conversation.processed', desc: t.evConvProcessed,
+      payload: `{\n  "id": "uuid...",\n  "integration_type": "WhatsappConversation",\n  "enabled": "true",\n  "tracker_values": {\n    "summary": { "type": "string", "value": "Conversation summary..." },\n    "sentiment": { "type": "integer", "value": 4 }\n  },\n  "playbook": { "name": "Sales", "version": 49 }\n}`
+    },
+    {
+      action: 'written_conversation_message.created', desc: t.evMsgCreated,
+      payload: `{\n  "action": "written_conversation_message.created",\n  "id": "uuid...",\n  "written_conversation_id": "uuid...",\n  "content": "Hello, I need help with my order",\n  "message_type": "message-in",\n  "sent_at": "2024-10-22T18:15:00Z",\n  "created_at": "2024-10-22T18:15:01Z",\n  "format": "chat",\n  "contact": {\n    "id": "uuid...",\n    "name": "John Doe",\n    "phone_numbers": ["+13055551234"]\n  }\n}`
+    }
+  ];
+}
+
+// ─── RENDER HELPERS ────────────────────────────────────────────────────────────
+function paramsTable(params, kind, lang) {
+  const t = T[lang];
+  if (!params || !params.length) return '';
+  const title = kind === 'path' ? t.lPathParams : kind === 'query' ? t.lQueryParams : t.lReqBody;
+  let rows = params.map(p => `<tr>
+    <td><span class="p-name">${p.name}</span><span class="${p.req ? 'p-req' : 'p-opt'}">${p.req ? t.lRequired : t.lOptional}</span></td>
+    <td><span class="p-type">${p.type}</span></td>
+    <td>${p.desc}</td>
+    <td><span class="p-ex">${p.ex}</span></td>
+  </tr>`).join('');
+  return `<div class="tbl-title">${title}</div>
+  <table class="params-tbl">
+    <thead><tr><th>${t.lName}</th><th>${t.lType}</th><th>${t.lDesc}</th><th>${t.lExample}</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function responsesSection(responses, lang) {
+  const t = T[lang];
+  let rows = responses.map(r => `<div class="resp-row">
+    <span class="resp-code ${r.cls}">${r.code}</span>
+    <span>${r.desc}</span>
+  </div>`).join('');
+  return `<div class="tbl-title" style="margin-top:20px">${t.lResponses}</div>
+  <div style="border:1px solid var(--border);border-radius:8px;padding:6px 14px;margin-bottom:16px">${rows}</div>`;
+}
+
+function renderEndpoint(ep, lang) {
+  const t = T[lang];
+  const mClass = 'm-' + ep.method.toLowerCase();
+  return `<div class="ep-card">
+    <div class="ep-hdr" onclick="toggleEp(this)" id="${ep.id}-hdr">
+      <span class="meth ${mClass}">${ep.method}</span>
+      <span class="ep-path">${ep.path}</span>
+      <span class="ep-sum">${ep.sum}</span>
+      <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="ep-body" id="${ep.id}-body">
+      <p class="ep-desc">${ep.desc}</p>
+      ${paramsTable(ep.pathParams, 'path', lang)}
+      ${paramsTable(ep.queryParams, 'query', lang)}
+      ${paramsTable(ep.body, 'body', lang)}
+      <div class="tbl-title">${t.lExReq}</div>
+      <pre><code>${escHtml(ep.curl)}</code></pre>
+      <div class="tbl-title">${t.lExRes}</div>
+      <pre><code>${escHtml(ep.resExample)}</code></pre>
+      ${responsesSection(ep.responses, lang)}
+    </div>
+  </div>`;
+}
+
+function renderEvent(ev, lang) {
+  const t = T[lang];
+  let causesHtml = '';
+  if (ev.errorCauses) {
+    causesHtml = `<div class="tbl-title" style="margin-top:16px">${t.errCausesTitle}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">
+      ${ev.errorCauses.map(c => `<code class="ic">${c}</code>`).join('')}
+    </div>`;
+  }
+  return `<div class="ev-card">
+    <div class="ev-hdr" onclick="toggleEv(this)" id="ev-${ev.action.replace(/\./g,'-')}-hdr">
+      <span class="ev-action">${ev.action}</span>
+      <span class="ev-desc">${ev.desc}</span>
+      <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="ev-body" id="ev-${ev.action.replace(/\./g,'-')}-body">
+      <p class="ev-desc-full">${ev.desc}</p>
+      <div class="tbl-title">Payload</div>
+      <pre><code>${escHtml(ev.payload)}</code></pre>
+      ${causesHtml}
+    </div>
+  </div>`;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ─── SIDEBAR ───────────────────────────────────────────────────────────────────
+function renderSidebar(lang) {
+  const t = T[lang];
+  const eps = getEndpoints(lang);
+  function sbLink(href, text, method) {
+    const badge = method ? `<span class="sb-method m-${method.toLowerCase()}">${method}</span>` : '';
+    return `<a href="${href}" class="sb-link">${badge}${text}</a>`;
+  }
+  return `
+    <div class="sb-group-label">${t.navOverview}</div>
+    ${sbLink('#overview', t.navGettingStarted)}
+    ${sbLink('#auth-section', t.navAuth)}
+    <div class="sb-group-label">${t.navRestApi}</div>
+    ${eps.auth.map(ep => sbLink('#'+ep.id, ep.sum, ep.method)).join('')}
+    <div class="sb-group-label">${t.navExports}</div>
+    ${eps.exports.map(ep => sbLink('#'+ep.id, ep.sum, ep.method)).join('')}
+    <div class="sb-group-label">${t.navMeetings}</div>
+    ${eps.meetings.map(ep => sbLink('#'+ep.id, ep.sum, ep.method)).join('')}
+    <div class="sb-group-label">${t.navCalls}</div>
+    ${eps.phone_calls.map(ep => sbLink('#'+ep.id, ep.sum, ep.method)).join('')}
+    <div class="sb-group-label">${t.navPlaybooks}</div>
+    ${eps.playbooks.map(ep => sbLink('#'+ep.id, ep.sum, ep.method)).join('')}
+    <div class="sb-group-label">${t.navTranscripts}</div>
+    ${eps.transcripts.map(ep => sbLink('#'+ep.id, ep.sum, ep.method)).join('')}
+    <div class="sb-group-label">${t.navUsers}</div>
+    ${eps.users.map(ep => sbLink('#'+ep.id, ep.sum, ep.method)).join('')}
+    <div class="sb-group-label">${t.navWebhooks}</div>
+    ${sbLink('#wh-setup', t.navWHSetup)}
+    ${sbLink('#wh-sig', t.navWHSig)}
+    ${sbLink('#wh-events', t.navWHEvents)}
+  `;
+}
+
+// ─── MAIN CONTENT ──────────────────────────────────────────────────────────────
+function renderMain(lang) {
+  const t = T[lang];
+  const eps = getEndpoints(lang);
+  const events = getEvents(lang);
+
+  function section(id, title, content) {
+    return `<section class="sec" id="${id}">
+      <div class="sec-title">${title}</div>
+      ${content}
+    </section>`;
+  }
+
+  // Overview
+  const overviewHtml = `
+    <div class="hero">
+      <h1>${t.heroTitle}</h1>
+      <p>${t.heroSub}</p>
+      <div class="hero-badges">
+        <div class="hero-badge"><div class="hero-badge-dot"></div>${t.heroV1}</div>
+        <div class="hero-badge"><div class="hero-badge-dot"></div>${t.heroJson}</div>
+        <div class="hero-badge"><div class="hero-badge-dot"></div>${t.heroBearer}</div>
+      </div>
+    </div>
+    <section class="sec" id="overview">
+      <div class="sec-title">${t.gsTitle}</div>
+      <p class="sec-desc">${t.gsDesc}</p>
+      <pre><code>https://{subdomain}.diio.com/api/external</code></pre>
+      <p class="sec-desc">${t.gsDesc2}</p>
+      <p class="sec-desc">${t.gsContentType}</p>
+    </section>
+    <section class="sec" id="auth-section">
+      <div class="sec-title">${t.authTitle}</div>
+      <p class="sec-desc">${t.authDesc}</p>
+      <p class="sec-desc">${t.authCreds}</p>
+      <ul class="creds-list">
+        <li>${t.authCred1}</li>
+        <li>${t.authCred2}</li>
+        <li>${t.authCred3}</li>
+      </ul>
+      <p class="sec-desc" style="margin-top:16px">${t.authHeaderLabel}</p>
+      <pre><code>Authorization: Bearer &lt;access_token&gt;</code></pre>
+    </section>
+  `;
+
+  // REST API sections
+  const restSections = [
+    { id: 'sec-auth', label: T[lang].navAuthEp, data: eps.auth },
+    { id: 'sec-exports', label: T[lang].navExports, data: eps.exports },
+    { id: 'sec-meetings', label: T[lang].navMeetings, data: eps.meetings },
+    { id: 'sec-calls', label: T[lang].navCalls, data: eps.phone_calls },
+    { id: 'sec-playbooks', label: T[lang].navPlaybooks, data: eps.playbooks },
+    { id: 'sec-transcripts', label: T[lang].navTranscripts, data: eps.transcripts },
+    { id: 'sec-users', label: T[lang].navUsers, data: eps.users },
+  ].map(s => `<section class="sec" id="${s.id}">
+    <div class="sec-title">${s.label}</div>
+    ${s.data.map(ep => `<div id="${ep.id}">${renderEndpoint(ep, lang)}</div>`).join('')}
+  </section>`).join('');
+
+  // Webhooks section
+  const whHtml = `
+    <section class="sec" id="sec-webhooks">
+      <div class="sec-title">${t.whTitle}</div>
+      <p class="sec-desc">${t.whIntro}</p>
+    </section>
+    <section class="sec" id="wh-setup">
+      <div class="sec-title">${t.whSetupTitle}</div>
+      <p class="sec-desc">${t.whSetupDesc}</p>
+      <div class="sub-title">${t.whValidTitle}</div>
+      <p class="sec-desc">${t.whValidDesc}</p>
+      <pre><code>GET https://yourserver.com/webhook?echo_string=abc123challenge
+
+# Response (plain text):
+abc123challenge</code></pre>
+    </section>
+    <section class="sec" id="wh-sig">
+      <div class="sec-title">${t.whSigTitle}</div>
+      <p class="sec-desc">${t.whSigDesc}</p>
+      <pre><code>sign = "&lt;webhook_id&gt;-&lt;DO-Timestamp&gt;"
+DO-Signature == HMAC-SHA256(signing_secret, sign)</code></pre>
+      <div class="info-box">${t.whSigSecret}</div>
+      <div class="sub-title">Python</div>
+      <pre><code>import hmac, hashlib
+
+def verify_signature(webhook_id, timestamp, signature, secret):
+    sign = f"{webhook_id}-{timestamp}"
+    expected = hmac.new(
+        secret.encode(), sign.encode(), hashlib.sha256
+    ).hexdigest()
+    return hmac.compare_digest(expected, signature)</code></pre>
+      <div class="sub-title">Node.js</div>
+      <pre><code>const crypto = require('crypto');
+
+function verifySignature(webhookId, timestamp, signature, secret) {
+  const sign = \`\${webhookId}-\${timestamp}\`;
+  const expected = crypto
+    .createHmac('sha256', secret)
+    .update(sign)
+    .digest('hex');
+  return crypto.timingSafeEqual(
+    Buffer.from(expected), Buffer.from(signature)
+  );
+}</code></pre>
+    </section>
+    <section class="sec" id="wh-events">
+      <div class="sec-title">${t.whEventsTitle}</div>
+      <p class="sec-desc">${t.whEventsDesc}</p>
+      ${events.map(ev => renderEvent(ev, lang)).join('')}
+    </section>
+  `;
+
+  return overviewHtml + restSections + whHtml;
+}
+
+// ─── TOGGLE HELPERS ────────────────────────────────────────────────────────────
+function toggleEp(hdr) {
+  hdr.classList.toggle('open');
+  const body = document.getElementById(hdr.id.replace('-hdr', '-body'));
+  if (body) body.classList.toggle('open');
+}
+function toggleEv(hdr) {
+  hdr.classList.toggle('open');
+  const body = document.getElementById(hdr.id.replace('-hdr', '-body'));
+  if (body) body.classList.toggle('open');
+}
+
+// ─── LANGUAGE SWITCH ───────────────────────────────────────────────────────────
+let currentLang = 'en';
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent === lang.toUpperCase());
+  });
+  document.getElementById('sidebar').innerHTML = renderSidebar(lang);
+  document.getElementById('main').innerHTML = renderMain(lang);
+  document.getElementById('footer-copy').textContent = T[lang].footerCopy;
+  document.getElementById('footer-link').textContent = T[lang].footerLink;
+  document.documentElement.lang = lang;
+  // Update sidebar active on scroll
+  setupScrollSpy();
+}
+
+// ─── SCROLL SPY ────────────────────────────────────────────────────────────────
+function setupScrollSpy() {
+  const links = document.querySelectorAll('.sb-link');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        links.forEach(l => {
+          const href = l.getAttribute('href');
+          l.classList.toggle('active', href === '#' + id);
+        });
+      }
+    });
+  }, { rootMargin: '-60px 0px -70% 0px' });
+
+  document.querySelectorAll('.sec').forEach(sec => observer.observe(sec));
+}
+
+// ─── BACK TO TOP ───────────────────────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  const btt = document.getElementById('btt');
+  btt.classList.toggle('show', window.scrollY > 400);
+});
+
+// ─── INIT ──────────────────────────────────────────────────────────────────────
+setLang('en');
+</script>
+</body>
 </html>

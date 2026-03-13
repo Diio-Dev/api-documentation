@@ -1,0 +1,615 @@
+openapi: 3.1.0
+info:
+  title: diio Webhooks API
+  version: 1-oas3.1
+  description: >
+    Documentación de los webhooks enviados por diio hacia tu endpoint.
+
+
+    ## Validación del Endpoint
+
+    Antes de recibir eventos, diio valida tu endpoint con un `GET` que incluye
+    el parámetro `echo_string`. Tu endpoint debe responder en texto plano con el
+    valor de ese parámetro:
+
+    ```
+
+    GET https://tuendpoint.com/webhook?echo_string=:valor_a_retornar
+
+    ```
+
+
+    ## Verificación de Firma
+
+    Todos los requests de diio incluyen los headers `DO-Signature` y
+    `DO-Timestamp`. Para verificar la autenticidad:
+
+    ```
+
+    sign = "<id_webhook>-<DO-Timestamp>"
+
+    DO-Signature == HMAC-SHA256(signing_secret, sign)
+
+    ```
+servers:
+  - url: https://tuendpoint.com
+    description: Tu servidor receptor de webhooks
+paths:
+  /webhook:
+    get:
+      summary: Validación del endpoint (Challenge)
+      description: >
+        diio realiza este GET para verificar que tu endpoint existe y está listo
+
+        para recibir eventos. Debes responder en texto plano con el valor del
+        parámetro `echo_string`.
+      parameters:
+        - name: echo_string
+          in: query
+          required: true
+          description: Valor que debes retornar en texto plano como cuerpo de la respuesta.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Respuesta exitosa con el valor de echo_string en texto plano.
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: abc123challenge
+    post:
+      summary: Recepción de eventos webhook
+      description: >
+        diio envía un `POST` a tu endpoint cada vez que ocurre un evento al que
+        estás suscrito.
+
+        El cuerpo es un JSON cuya estructura varía según el tipo de evento
+        (`action`).
+      parameters:
+        - name: DO-Signature
+          in: header
+          required: true
+          description: Firma HMAC-SHA256 para verificar que el request proviene de diio.
+          schema:
+            type: string
+        - name: DO-Timestamp
+          in: header
+          required: true
+          description: Timestamp del request, usado para calcular la firma.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/MeetingInProgress'
+                - $ref: '#/components/schemas/MeetingPending'
+                - $ref: '#/components/schemas/MeetingFinished'
+                - $ref: '#/components/schemas/MeetingError'
+                - $ref: '#/components/schemas/PhoneCallInProgress'
+                - $ref: '#/components/schemas/PhoneCallPending'
+                - $ref: '#/components/schemas/PhoneCallFinished'
+                - $ref: '#/components/schemas/PhoneCallError'
+                - $ref: '#/components/schemas/ConversationProcessed'
+                - $ref: '#/components/schemas/MessageCreated'
+              discriminator:
+                propertyName: action
+                mapping:
+                  meeting.in_progress: '#/components/schemas/MeetingInProgress'
+                  meeting.pending: '#/components/schemas/MeetingPending'
+                  meeting.finished: '#/components/schemas/MeetingFinished'
+                  meeting.error: '#/components/schemas/MeetingError'
+                  phone_call.in_progress: '#/components/schemas/PhoneCallInProgress'
+                  phone_call.pending: '#/components/schemas/PhoneCallPending'
+                  phone_call.finished: '#/components/schemas/PhoneCallFinished'
+                  phone_call.error: '#/components/schemas/PhoneCallError'
+                  written_conversation.processed: '#/components/schemas/ConversationProcessed'
+                  written_conversation_message.created: '#/components/schemas/MessageCreated'
+            examples:
+              meeting_in_progress:
+                summary: Reunión en Progreso
+                value:
+                  action: meeting.in_progress
+                  id: 7b292f4a-90a1-11ef-9462-0a0ddbb5e2f5
+                  name: Reunión de Ejemplo
+                  scheduled_at: 2024-10-22T18:15:00+0000
+                  attendees_tracker:
+                    - join: '2024-10-22T18:15:20.875118Z'
+                      name: John Doe
+                      is_host: true
+                  analyzed_status: in_progress
+                  error_cause: null
+              meeting_finished:
+                summary: Reunión Analizada
+                value:
+                  action: meeting.finished
+                  id: 415b1e52-bc8b-11ef-94d3-06c15ad63b85
+                  name: Meeting name
+                  scheduled_at: '2024-12-17T15:30:00Z'
+                  analyzed_status: finished
+                  error_cause: null
+                  duration: 107
+              phone_call_finished:
+                summary: Llamada Finalizada
+                value:
+                  action: phone_call.finished
+                  id: 8e762d54-90a7-11ef-b0af-0a0ddbb5e2f5
+                  name: Llamada de Prueba
+                  ocurred_at: 2024-10-22T18:54:16+0000
+                  analyzed_status: finished
+                  error_cause: null
+      responses:
+        '200':
+          description: Evento recibido correctamente.
+        '400':
+          description: Request inválido.
+        '500':
+          description: Error interno del servidor.
+components:
+  schemas:
+    TrackerValues:
+      type: object
+      description: Valores analizados por el playbook de IA.
+      properties:
+        summary:
+          type: object
+          properties:
+            type:
+              type: string
+              example: string
+            value:
+              type: string
+              example: Resumen de la interacción...
+        sentiment:
+          type: object
+          properties:
+            hint:
+              type: string
+            type:
+              type: string
+              example: integer
+            value:
+              type: integer
+              example: 3
+        objections:
+          type: object
+          properties:
+            type:
+              type: string
+              example: string
+            value:
+              type: string
+        competitors:
+          type: object
+          properties:
+            type:
+              type: string
+              example: array
+            value:
+              type: array
+              items:
+                type: string
+        success_odds:
+          type: object
+          properties:
+            hint:
+              type: string
+            type:
+              type: string
+              example: integer
+            value:
+              type: integer
+              example: 4
+        customer_pains:
+          type: object
+          properties:
+            type:
+              type: string
+              example: string
+            value:
+              type: string
+        follow_up_email:
+          type: object
+          properties:
+            type:
+              type: string
+              example: string
+            value:
+              type: string
+        time_to_decision:
+          type: object
+          properties:
+            type:
+              type: string
+              example: string
+            value:
+              type: string
+        unresolve_queries:
+          type: object
+          properties:
+            type:
+              type: string
+              example: string
+            value:
+              type: string
+    Playbook:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Sales
+        version:
+          type: integer
+          example: 49
+    AttendeeTracker:
+      type: object
+      properties:
+        join:
+          type: string
+          format: date-time
+        name:
+          type: string
+        is_host:
+          type: boolean
+    MeetingBase:
+      type: object
+      required:
+        - action
+        - id
+        - name
+        - scheduled_at
+        - analyzed_status
+      properties:
+        action:
+          type: string
+        id:
+          type: string
+          format: uuid
+          description: Identificador único de la reunión.
+        name:
+          type: string
+          description: Nombre de la reunión.
+        scheduled_at:
+          type: string
+          format: date-time
+          description: Fecha y hora programada de la reunión.
+        analyzed_status:
+          type: string
+          enum:
+            - pending
+            - in_progress
+            - finished
+            - error
+        error_cause:
+          type: string
+          nullable: true
+          description: Causa del error si analyzed_status es "error".
+    MeetingInProgress:
+      allOf:
+        - $ref: '#/components/schemas/MeetingBase'
+        - type: object
+          properties:
+            action:
+              type: string
+              enum:
+                - meeting.in_progress
+            attendees_tracker:
+              type: array
+              items:
+                $ref: '#/components/schemas/AttendeeTracker'
+    MeetingPending:
+      allOf:
+        - $ref: '#/components/schemas/MeetingBase'
+        - type: object
+          properties:
+            action:
+              type: string
+              enum:
+                - meeting.pending
+            attendees_tracker:
+              type: array
+              items:
+                $ref: '#/components/schemas/AttendeeTracker'
+    MeetingFinished:
+      allOf:
+        - $ref: '#/components/schemas/MeetingBase'
+        - type: object
+          properties:
+            action:
+              type: string
+              enum:
+                - meeting.finished
+            duration:
+              type: integer
+              description: Duración de la reunión en minutos.
+            attendees:
+              type: object
+              properties:
+                sellers:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      email:
+                        type: string
+                        format: email
+                      user_id:
+                        type: string
+                        format: uuid
+                support:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      email:
+                        type: string
+                        format: email
+                      user_id:
+                        type: string
+                        format: uuid
+                customers:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      email:
+                        type: string
+                        format: email
+            participants:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  role:
+                    type: string
+                    enum:
+                      - seller
+                      - customer
+                      - support
+                  show:
+                    type: boolean
+                  email:
+                    type: string
+                    format: email
+                  speak_time:
+                    type: integer
+                    nullable: true
+                    description: Tiempo hablando en segundos.
+                  arrive_time:
+                    type: string
+                    format: date-time
+            tracker_values:
+              $ref: '#/components/schemas/TrackerValues'
+            playbook:
+              $ref: '#/components/schemas/Playbook'
+            commitments:
+              type: object
+              properties:
+                todo:
+                  type: string
+                who:
+                  type: string
+                deadline:
+                  type: string
+                  format: date-time
+    MeetingError:
+      allOf:
+        - $ref: '#/components/schemas/MeetingBase'
+        - type: object
+          properties:
+            action:
+              type: string
+              enum:
+                - meeting.error
+            attendees_tracker:
+              type: array
+              items:
+                $ref: '#/components/schemas/AttendeeTracker'
+            error_cause:
+              type: string
+              enum:
+                - without_start_time
+                - recurring_event
+                - without_external_participants
+                - meeting_without_conference_url
+                - too_many_sellers
+                - user_without_seat
+                - bot_errored
+                - bot_errored_by_platform
+                - bot_cant_enter_meeting
+                - no_participants_or_host
+                - bot_not_accepted
+                - recording_permission_denied
+                - couldnt_download_video
+                - couldnt_be_transcribed
+                - blank_transcript
+                - transcript_too_short
+                - couldnt_find_playbook
+                - meeting_already_started_or_ended
+                - meeting_manually_deactivated
+    PhoneCallBase:
+      type: object
+      required:
+        - action
+        - id
+        - name
+        - ocurred_at
+        - analyzed_status
+      properties:
+        action:
+          type: string
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        ocurred_at:
+          type: string
+          format: date-time
+          description: Fecha y hora en que ocurrió la llamada.
+        analyzed_status:
+          type: string
+          enum:
+            - pending
+            - in_progress
+            - finished
+            - error
+        error_cause:
+          type: string
+          nullable: true
+    PhoneCallInProgress:
+      allOf:
+        - $ref: '#/components/schemas/PhoneCallBase'
+        - type: object
+          properties:
+            action:
+              type: string
+              enum:
+                - phone_call.in_progress
+    PhoneCallPending:
+      allOf:
+        - $ref: '#/components/schemas/PhoneCallBase'
+        - type: object
+          properties:
+            action:
+              type: string
+              enum:
+                - phone_call.pending
+    PhoneCallFinished:
+      allOf:
+        - $ref: '#/components/schemas/PhoneCallBase'
+        - type: object
+          properties:
+            action:
+              type: string
+              enum:
+                - phone_call.finished
+            tracker_values:
+              $ref: '#/components/schemas/TrackerValues'
+            playbook:
+              $ref: '#/components/schemas/Playbook'
+    PhoneCallError:
+      allOf:
+        - $ref: '#/components/schemas/PhoneCallBase'
+        - type: object
+          properties:
+            action:
+              type: string
+              enum:
+                - phone_call.error
+            error_cause:
+              type: string
+              enum:
+                - couldnt_download_audio
+                - couldnt_be_transcribed
+                - blank_transcript
+                - transcript_too_short
+                - couldnt_find_playbook
+                - voicemail
+                - wrong_number
+                - rejected
+                - reschedule_request
+    ConversationProcessed:
+      type: object
+      required:
+        - id
+        - integration_type
+        - enabled
+      properties:
+        id:
+          type: string
+          format: uuid
+        integration_type:
+          type: string
+          example: WhatsappConversation
+        enabled:
+          type: string
+          enum:
+            - 'true'
+            - 'false'
+        last_message_sent:
+          type: object
+          description: Último mensaje enviado en la conversación.
+        participants:
+          type: object
+          description: Participantes de la conversación.
+        tracker_values:
+          $ref: '#/components/schemas/TrackerValues'
+        playbook:
+          $ref: '#/components/schemas/Playbook'
+    MessageCreated:
+      type: object
+      required:
+        - id
+        - written_conversation_id
+        - content
+        - message_type
+        - action
+      properties:
+        action:
+          type: string
+          enum:
+            - written_conversation_message.created
+        id:
+          type: string
+          format: uuid
+        written_conversation_id:
+          type: string
+          format: uuid
+        content:
+          type: string
+          description: Contenido del mensaje.
+        message_type:
+          type: string
+          enum:
+            - message-in
+            - message-out
+          description: >-
+            `message-in` = mensaje recibido desde contacto. `message-out` =
+            mensaje enviado hacia contacto.
+        sent_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        format:
+          type: string
+          example: chat
+        contact:
+          type: object
+          description: Presente cuando message_type es "message-in".
+          properties:
+            id:
+              type: string
+              format: uuid
+            name:
+              type: string
+            phone_numbers:
+              type: array
+              items:
+                type: string
+        user:
+          type: object
+          description: Presente cuando message_type es "message-out".
+          properties:
+            id:
+              type: string
+              format: uuid
+            email:
+              type: string
+              format: email
