@@ -143,8 +143,18 @@
     .footer a { color: var(--primary); text-decoration: none; }
     .footer a:hover { text-decoration: underline; }
 
+    /* HAMBURGER */
+    .hdr-menu-btn { display: none; background: none; border: none; cursor: pointer; padding: 6px; margin-right: 8px; color: white; }
+    .hdr-menu-btn svg { display: block; }
+
+    /* SIDEBAR OVERLAY */
+    .sb-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 150; }
+    .sb-overlay.open { display: block; }
+
     @media (max-width: 900px) {
-      .sidebar { display: none; }
+      .hdr-menu-btn { display: flex; align-items: center; }
+      .sidebar { transform: translateX(-100%); transition: transform 0.25s ease; z-index: 160; top: 58px; }
+      .sidebar.open { transform: translateX(0); }
       .main { margin-left: 0; padding: 24px 20px 60px; }
       .footer { margin-left: 0; padding: 20px; }
       .hero { padding: 28px 24px; }
@@ -155,6 +165,13 @@
 <body>
 
 <header class="hdr">
+  <button class="hdr-menu-btn" id="menuBtn" aria-label="Open navigation" onclick="toggleSidebar()">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect y="4" width="22" height="2" rx="1" fill="white"/>
+      <rect y="10" width="22" height="2" rx="1" fill="white"/>
+      <rect y="16" width="22" height="2" rx="1" fill="white"/>
+    </svg>
+  </button>
   <a href="#overview" class="hdr-logo">
     <div class="logo-mark">d</div>
     <span class="logo-name">diio</span>
@@ -167,6 +184,7 @@
   </div>
 </header>
 
+<div class="sb-overlay" id="sbOverlay" onclick="toggleSidebar()"></div>
 <div class="layout">
   <nav class="sidebar" id="sidebar"></nav>
   <main class="main" id="main"></main>
@@ -1006,6 +1024,22 @@ function setupScrollSpy() {
 window.addEventListener('scroll', () => {
   const btt = document.getElementById('btt');
   btt.classList.toggle('show', window.scrollY > 400);
+});
+
+// ─── MOBILE SIDEBAR ────────────────────────────────────────────────────────────
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sbOverlay');
+  const isOpen = sidebar.classList.toggle('open');
+  overlay.classList.toggle('open', isOpen);
+}
+
+// Close sidebar when a nav link is clicked on mobile
+document.addEventListener('click', function(e) {
+  if (e.target.closest('#sidebar a')) {
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar.classList.contains('open')) toggleSidebar();
+  }
 });
 
 // ─── INIT ──────────────────────────────────────────────────────────────────────
