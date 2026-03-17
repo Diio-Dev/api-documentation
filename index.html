@@ -714,7 +714,7 @@ function getEndpoints(lang) {
       ],
       curl: `curl "https://your-company.diio.com/api/external/v1/users?page=1" \\
   -H "Authorization: Bearer <access_token>"`,
-      resExample: `{\n  "users": [\n    { "id": "91992f26-a585-11ee-bc7e-06d5ade5f257", "name": "John Doe", "email": "john@doe.com" },\n    { "id": "0b3e264a-9b83-11ee-9bd5-06d5ade5f257", "name": "Jane Doe", "email": "jane@doe.com" }\n  ]\n}`,
+      resExample: `{\n  "users": [\n    { "id": "91992f26-a585-11ee-bc7e-06d5ade5f257", "name": "John Doe", "email": "john@doe.com", "occupy_seat": true },\n    { "id": "0b3e264a-9b83-11ee-9bd5-06d5ade5f257", "name": "Jane Doe", "email": "jane@doe.com", "occupy_seat": false }\n  ]\n}`,
       responses: [{ code: '200', cls: 's200', desc: t.r200List }, ...stdErrors404]
     }]
   };
